@@ -1,3 +1,7 @@
+package tasks;
+
+import enums.Status;
+
 public class Subtask extends Task {
     private Epic epic;
 

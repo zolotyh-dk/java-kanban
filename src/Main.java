@@ -1,99 +1,168 @@
-import java.util.ArrayList;
+import enums.Status;
+import tasks.Epic;
+import tasks.Subtask;
+import tasks.Task;
+import util.TaskUtil;
+import java.util.List;
+
+import static util.TaskUtil.*;
 
 public class Main {
-    private static final String delimiter = "-".repeat(150);
+    private static final String DELIMITER = "-".repeat(150);
+
     public static void main(String[] args) {
         TaskManager taskManager = new TaskManager();
 
-        Task task1 = new Task(null,
-                "Выучить инкапсуляцию.",
-                "Разобраться с модификаторами доступа, геттерами и сеттерами.",
-                Status.NEW);
-        Task task2 = new Task(null,
-                "Выучить наследование.",
-                "Разобраться с ключевым словом extends и переопределением методов.",
-                Status.IN_PROGRESS);
-
-        Epic epic1 = new Epic(null,
-                "Приложение канбан-доска",
-                "Разработать приложение канбан-доску");
-        Subtask subtask1 = new Subtask(null,
-                "Разработать бэкенд",
-                "Написть серверную часть приложения",
-                Status.IN_PROGRESS,
-                epic1);
-        Subtask subtask2 = new Subtask(null,
-                "Разработать фронтенд",
-                "Написать клиентскую часть приложения",
-                Status.NEW,
-                epic1);
-
-        Epic epic2 = new Epic(null,
-                "iOS приложение",
-                "Разработать iOS приложение для канбан-доски");
-        Subtask subtask3 = new Subtask(null,
-                "Выучить swift",
-                "Без swift нам никак не написать приложение для iOS",
-                Status.NEW,
-                epic2);
-
-        saveTaskTest(task1, taskManager);
+        saveTaskTest(TaskUtil.task1, taskManager);
         saveEpicTest(epic1, taskManager);
         saveSubtaskTest(subtask1, taskManager);
+        saveSubtaskTest(subtask2, taskManager);
 
         updateTaskTest(task2, taskManager);
         updateEpicTest(epic2, taskManager);
         updateSubtaskTest(subtask3, taskManager);
+
+        getSubtasksByEpicTest(epic1, taskManager);
+
+        getAllTasksTest(taskManager);
+        getAllEpicsTest(taskManager);
+        getAllSubtasksTest(taskManager);
+
+        removeTaskByIdTest(task1.getId(), taskManager);
+        removeEpicByIdTest(epic1.getId(), taskManager);
+        removeSubtaskByIdTest(subtask3.getId(), taskManager);
+
+        removeAllTasksTest(taskManager);
+        removeAllSubtasksTest(taskManager);
+        removeAllEpicsTest(taskManager);
     }
 
     private static void saveTaskTest(Task task, TaskManager manager) {
         System.out.println("saveTaskTest");
-        Integer id = manager.saveOrUpdate(task).getId();
-        System.out.println("Сохранено: " + manager.tasks.get(id));
-        System.out.println(delimiter);
+        int id = manager.saveOrUpdate(task);
+        System.out.println("Сохранено: " + manager.getTaskById(id));
+        System.out.println(DELIMITER);
     }
 
     private static void saveEpicTest(Epic epic, TaskManager manager) {
         System.out.println("saveEpicTest");
-        Integer id = manager.saveOrUpdate(epic).getId();
-        System.out.println("Сохранено: " + manager.epics.get(id));
-        System.out.println(delimiter);
+        int id = manager.saveOrUpdate(epic);
+        System.out.println("Сохранено: " + manager.getEpicById(id));
+        System.out.println(DELIMITER);
     }
 
     private static void saveSubtaskTest(Subtask subtask, TaskManager manager) {
         System.out.println("saveSubtaskTest");
-        Integer id = manager.saveOrUpdate(subtask).getId();
-        System.out.println("Сохранено: " + manager.subtasks.get(id));
-        System.out.println(delimiter);
+        int id = manager.saveOrUpdate(subtask);
+        System.out.println("Сохранено: " + manager.getSubtaskById(id));
+        System.out.println(DELIMITER);
     }
 
     private static void updateTaskTest(Task task, TaskManager manager) {
         System.out.println("updateTaskTest");
-        Integer id = manager.saveOrUpdate(task).getId();
+        int id = manager.saveOrUpdate(task);
         Task updated = new Task(id,
                 task.getName(),
                 task.getDescription() + " А ещё с сокрытием.",
                 Status.DONE);
         manager.saveOrUpdate(updated);
-        System.out.println("Обновлено: " + manager.tasks.get(id));
-        System.out.println(delimiter);
+        System.out.println("Обновлено: " + manager.getTaskById(id));
+        System.out.println(DELIMITER);
     }
 
     private static void updateEpicTest(Epic epic, TaskManager manager) {
         System.out.println("updateEpicTest");
-        Integer id = manager.saveOrUpdate(epic).getId();
+        int id = manager.saveOrUpdate(epic);
         Epic updated = new Epic(id, "Kanban-board iOS application ", epic.getDescription());
         manager.saveOrUpdate(updated);
-        System.out.println("Обновлено: " + manager.epics.get(id));
-        System.out.println(delimiter);
+        System.out.println("Обновлено: " + manager.getEpicById(id));
+        System.out.println(DELIMITER);
     }
 
     private static void updateSubtaskTest(Subtask subtask, TaskManager manager) {
         System.out.println("updateSubtaskTest");
-        Integer id = manager.saveOrUpdate(subtask).getId();
+        int id = manager.saveOrUpdate(subtask);
         Subtask updated = new Subtask(id, subtask.getName(), subtask.getDescription(), Status.DONE, subtask.getEpic());
         manager.saveOrUpdate(updated);
-        System.out.println("Обновлено: " + manager.subtasks.get(id));
-        System.out.println(delimiter);
+        System.out.println("Обновлено: " + manager.getSubtaskById(id));
+        System.out.println(DELIMITER);
+    }
+
+    private static void getAllTasksTest(TaskManager manager) {
+        System.out.println("getAllTasksTest()");
+        manager.getAllTasks().forEach(System.out::println);
+        System.out.println(DELIMITER);
+    }
+
+    private static void getAllEpicsTest(TaskManager manager) {
+        System.out.println("getAllEpicsTest");
+        manager.getAllEpics().forEach(System.out::println);
+        System.out.println(DELIMITER);
+    }
+
+    public static void getAllSubtasksTest(TaskManager manager) {
+        System.out.println("getAllSubtasksTest");
+        manager.getAllSubtasks().forEach(System.out::println);
+        System.out.println(DELIMITER);
+    }
+
+    public static void removeTaskByIdTest(int id, TaskManager manager) {
+        System.out.println("removeTaskByIdTest");
+        manager.removeTaskById(id);
+        System.out.println("После удаления задачи: ");
+        manager.getAllTasks().forEach(System.out::println);
+        System.out.println(DELIMITER);
+    }
+
+    public static void removeEpicByIdTest(int id, TaskManager manager) {
+        System.out.println("removeEpicByIdTest");
+        manager.removeEpicById(id);
+        System.out.println("Все эпики после удаления:");
+        manager.getAllEpics().forEach(System.out::println);
+        System.out.println("Все подзадачи после удаления эпика:");
+        manager.getAllSubtasks().forEach(System.out::println);
+        System.out.println(DELIMITER);
+    }
+
+    public static void removeSubtaskByIdTest(int id, TaskManager manager) {
+        System.out.println("removeSubtaskByIdTest");
+        manager.removeSubtaskById(id);
+        System.out.println("Все подзадачи после удаления:");
+        manager.getAllSubtasks().forEach(System.out::println);
+        System.out.println("Все эпики после удаления подзадачи:");
+        manager.getAllEpics().forEach(System.out::println);
+        System.out.println(DELIMITER);
+    }
+
+    public static void removeAllTasksTest(TaskManager manager) {
+        System.out.println("removeAllTasksTest");
+        manager.removeAllTasks();
+        System.out.println("Удалили все задачи. Задач осталось: " + manager.tasks.size());
+        System.out.println(DELIMITER);
+    }
+
+    public static void removeAllSubtasksTest(TaskManager manager) {
+        System.out.println("removeAllSubtasksTest");
+        manager.removeAllSubtasks();
+        System.out.println("Удалили все позадачи. Подзадач осталось: " + manager.subtasks.size());
+        System.out.println("Все эпики после удаления подзадач:");
+        manager.getAllEpics().forEach(System.out::println);
+        System.out.println(DELIMITER);
+    }
+
+    public static void removeAllEpicsTest(TaskManager manager) {
+        System.out.println("removeAllEpicsTest");
+        manager.removeAllEpics();
+        System.out.println("Удалили все эпики. Эпиков осталось: " + manager.epics.size());
+        System.out.println("Подзадач осталось: " + manager.subtasks.size());
+        System.out.println(DELIMITER);
+    }
+
+    public static void getSubtasksByEpicTest(Epic epic, TaskManager manager) {
+        System.out.println("getSubtasksByEpicTest");
+        System.out.println("Для эпика: " + epic);
+        System.out.println("все подзадачи: ");
+        manager.getSubtasksByEpic(epic).forEach(System.out::println);
+        System.out.println(DELIMITER);
     }
 }
