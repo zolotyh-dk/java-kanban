@@ -7,6 +7,8 @@ import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;
 import ru.yandex.javacourse.zolotyh.schedule.util.TaskUtil;
 
+import static ru.yandex.javacourse.zolotyh.schedule.util.TaskUtil.*;
+
 public class Main {
     private static final String DELIMITER = "-".repeat(150);
 
@@ -137,14 +139,14 @@ public class Main {
     public static void removeAllTasksTest(TaskManager manager) {
         System.out.println("removeAllTasksTest");
         manager.removeAllTasks();
-        System.out.println("Удалили все задачи. Задач осталось: " + manager.tasks.size());
+        System.out.println("Удалили все задачи. Задач осталось: " + manager.getAllTasks().size());
         System.out.println(DELIMITER);
     }
 
     public static void removeAllSubtasksTest(TaskManager manager) {
         System.out.println("removeAllSubtasksTest");
         manager.removeAllSubtasks();
-        System.out.println("Удалили все позадачи. Подзадач осталось: " + manager.subtasks.size());
+        System.out.println("Удалили все позадачи. Подзадач осталось: " + manager.getAllSubtasks().size());
         System.out.println("Все эпики после удаления подзадач:");
         manager.getAllEpics().forEach(System.out::println);
         System.out.println(DELIMITER);
@@ -153,8 +155,8 @@ public class Main {
     public static void removeAllEpicsTest(TaskManager manager) {
         System.out.println("removeAllEpicsTest");
         manager.removeAllEpics();
-        System.out.println("Удалили все эпики. Эпиков осталось: " + manager.epics.size());
-        System.out.println("Подзадач осталось: " + manager.subtasks.size());
+        System.out.println("Удалили все эпики. Эпиков осталось: " + manager.getAllEpics().size());
+        System.out.println("Подзадач осталось: " + manager.getAllSubtasks().size());
         System.out.println(DELIMITER);
     }
 

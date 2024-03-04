@@ -11,9 +11,9 @@ import java.util.List;
 
 public class TaskManager {
     private int generatorId = 0;
-    public HashMap<Integer, Task> tasks = new HashMap<>();
-    public HashMap<Integer, Epic> epics = new HashMap<>();
-    public HashMap<Integer, Subtask> subtasks = new HashMap<>();
+    private HashMap<Integer, Task> tasks = new HashMap<>();
+    private HashMap<Integer, Epic> epics = new HashMap<>();
+    private HashMap<Integer, Subtask> subtasks = new HashMap<>();
 
     public List<Task> getAllTasks() {
         return new ArrayList<>(tasks.values());
