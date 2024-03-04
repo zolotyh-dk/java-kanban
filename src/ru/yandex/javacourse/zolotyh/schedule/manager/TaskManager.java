@@ -84,16 +84,8 @@ public class TaskManager {
         if (epic.getId() == null) {
             epic.setId(++generatorId);
         }
-
-        if (epic.getSubtasks() == null || epic.getSubtasks().isEmpty()) {
-            epic.setStatus(Status.NEW);
-        } else if (epic.isAllSubtasksDone()) {
-            epic.setStatus(Status.DONE);
-        } else {
-            epic.setStatus(Status.IN_PROGRESS);
-        }
-
         epics.put(epic.getId(), epic);
+        updateEpicStatus(epic.getId());
         return epic.getId();
     }
 
@@ -119,5 +111,16 @@ public class TaskManager {
 
     public List<Subtask> getSubtasksByEpic(Epic epic) {
         return epic.getSubtasks();
+    }
+
+    private void updateEpicStatus(int id) {
+        Epic epic = epics.get(id);
+        if (epic.getSubtasks() == null || epic.getSubtasks().isEmpty()) {
+            epic.setStatus(Status.NEW);
+        } else if (epic.isAllSubtasksDone()) {
+            epic.setStatus(Status.DONE);
+        } else {
+            epic.setStatus(Status.IN_PROGRESS);
+        }
     }
 }
