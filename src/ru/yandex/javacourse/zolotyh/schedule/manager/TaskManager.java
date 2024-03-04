@@ -1,7 +1,9 @@
-import enums.Status;
-import tasks.Epic;
-import tasks.Subtask;
-import tasks.Task;
+package ru.yandex.javacourse.zolotyh.schedule.manager;
+
+import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
+import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
+import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
+import ru.yandex.javacourse.zolotyh.schedule.task.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,8 +12,8 @@ import java.util.List;
 public class TaskManager {
     private int nextId = 0;
     public HashMap<Integer, Task> tasks = new HashMap<>();
-    public HashMap<Integer, tasks.Epic> epics = new HashMap<>();
-    public HashMap<Integer, tasks.Subtask> subtasks = new HashMap<>();
+    public HashMap<Integer, Epic> epics = new HashMap<>();
+    public HashMap<Integer, Subtask> subtasks = new HashMap<>();
 
     public List<Task> getAllTasks() {
         return new ArrayList<>(tasks.values());

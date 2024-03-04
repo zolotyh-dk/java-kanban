@@ -1,6 +1,6 @@
-package tasks;
+package ru.yandex.javacourse.zolotyh.schedule.task;
 
-import enums.Status;
+import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
 
 import java.util.ArrayList;
 import java.util.List;

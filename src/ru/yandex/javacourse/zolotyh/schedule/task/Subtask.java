@@ -1,6 +1,6 @@
-package tasks;
+package ru.yandex.javacourse.zolotyh.schedule.task;
 
-import enums.Status;
+import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
 
 public class Subtask extends Task {
     private Epic epic;

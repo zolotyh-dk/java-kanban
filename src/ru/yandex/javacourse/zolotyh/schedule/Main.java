@@ -1,10 +1,11 @@
-import enums.Status;
-import tasks.Epic;
-import tasks.Subtask;
-import tasks.Task;
-import util.TaskUtil;
+package ru.yandex.javacourse.zolotyh.schedule;
 
-import static util.TaskUtil.*;
+import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
+import ru.yandex.javacourse.zolotyh.schedule.manager.TaskManager;
+import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
+import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
+import ru.yandex.javacourse.zolotyh.schedule.task.Task;
+import ru.yandex.javacourse.zolotyh.schedule.util.TaskUtil;
 
 public class Main {
     private static final String DELIMITER = "-".repeat(150);
