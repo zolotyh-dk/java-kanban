@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 
 public class TaskManager {
-    private int nextId = 0;
+    private int generatorId = 0;
     public HashMap<Integer, Task> tasks = new HashMap<>();
     public HashMap<Integer, Epic> epics = new HashMap<>();
     public HashMap<Integer, Subtask> subtasks = new HashMap<>();
@@ -57,7 +57,7 @@ public class TaskManager {
 
     public int saveOrUpdate(Task task) {
         if (task.getId() == null) {
-            task.setId(nextId++);
+            task.setId(++generatorId);
         }
         tasks.put(task.getId(), task);
         return task.getId();
@@ -65,7 +65,7 @@ public class TaskManager {
 
     public int saveOrUpdate(Subtask subtask) {
         if (subtask.getId() == null) {
-            subtask.setId(nextId++);
+            subtask.setId(++generatorId);
         }
         subtasks.put(subtask.getId(), subtask);
 
@@ -82,7 +82,7 @@ public class TaskManager {
 
     public int saveOrUpdate(Epic epic) {
         if (epic.getId() == null) {
-            epic.setId(nextId++);
+            epic.setId(++generatorId);
         }
 
         if (epic.getSubtasks() == null || epic.getSubtasks().isEmpty()) {
