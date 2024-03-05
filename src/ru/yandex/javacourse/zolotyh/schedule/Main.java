@@ -132,7 +132,7 @@ public class Main {
 
     public static void removeSubtaskByIdTest(int id, TaskManager manager) {
         System.out.println("removeSubtaskByIdTest");
-        manager.removeSubtaskById(id);
+        manager.deleteSubtask(id);
         System.out.println("Все подзадачи после удаления:");
         manager.getAllSubtasks().forEach(System.out::println);
         System.out.println("Все эпики после удаления подзадачи:");
