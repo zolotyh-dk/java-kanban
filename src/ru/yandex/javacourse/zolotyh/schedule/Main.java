@@ -84,7 +84,7 @@ public class Main {
     private static void updateSubtaskTest(Subtask subtask, TaskManager manager) {
         System.out.println("updateSubtaskTest");
         int id = manager.saveOrUpdate(subtask);
-        Subtask updated = new Subtask(id, subtask.getName(), subtask.getDescription(), Status.DONE, subtask.getEpic());
+        Subtask updated = new Subtask(id, subtask.getName(), subtask.getDescription(), Status.DONE, subtask.getEpicId());
         manager.saveOrUpdate(updated);
         System.out.println("Обновлено: " + manager.getSubtaskById(id));
         System.out.println(DELIMITER);

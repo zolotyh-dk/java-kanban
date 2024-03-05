@@ -3,15 +3,15 @@ package ru.yandex.javacourse.zolotyh.schedule.task;
 import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
 
 public class Subtask extends Task {
-    private Epic epic;
+    private Integer epicId;
 
-    public Subtask(Integer id, String name, String description, Status status, Epic epic) {
+    public Subtask(Integer id, String name, String description, Status status, int epicId) {
         super(id, name, description, status);
-        this.epic = epic;
+        this.epicId = epicId;
     }
 
-    public Epic getEpic() {
-        return epic;
+    public int getEpicId() {
+        return epicId;
     }
 
     @Override
@@ -21,7 +21,7 @@ public class Subtask extends Task {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status + '\'' +
-                ", epicId=" + epic.id +
+                ", epicId=" + epicId +
                 '}';
     }
 }

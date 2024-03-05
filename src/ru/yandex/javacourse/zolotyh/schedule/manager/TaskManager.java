@@ -69,7 +69,8 @@ public class TaskManager {
         }
         subtasks.put(subtask.getId(), subtask);
 
-        Epic epic = subtask.getEpic();
+        int epicId = subtask.getEpicId();
+        Epic epic = epics.get(epicId);
         int index = epic.getSubtasks().indexOf(subtask);
         if (index == -1) {
             epic.getSubtasks().add(subtask);
@@ -103,7 +104,8 @@ public class TaskManager {
 
     public void removeSubtaskById(int id) {
         Subtask subtask = subtasks.get(id);
-        Epic epic = subtask.getEpic();
+        int epicId = subtask.getEpicId();
+        Epic epic = epics.get(epicId);
         epic.getSubtasks().remove(subtask);
         saveOrUpdate(epic);
         subtasks.remove(id);

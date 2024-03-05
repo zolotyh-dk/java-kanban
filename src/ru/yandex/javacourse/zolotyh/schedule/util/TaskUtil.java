@@ -21,12 +21,12 @@ public class TaskUtil {
             "Разработать бэкенд",
             "Написть серверную часть приложения",
             Status.IN_PROGRESS,
-            epic1);
+            epic1.getId());
     public static Subtask subtask2 = new Subtask(null,
             "Разработать фронтенд",
             "Написать клиентскую часть приложения",
             Status.NEW,
-            epic1);
+            epic1.getId());
 
     public static Epic epic2 = new Epic(null,
             "iOS приложение",
@@ -35,5 +35,5 @@ public class TaskUtil {
             "Выучить swift",
             "Без swift нам никак не написать приложение для iOS",
             Status.NEW,
-            epic2);
+            epic2.getId());
 }
