@@ -15,12 +15,13 @@ public class Main {
     public static void main(String[] args) {
         TaskManager taskManager = new TaskManager();
 
-        saveTaskTest(TaskUtil.task1, taskManager);
+        addNewTaskTest(TaskUtil.task1, taskManager);
+        updateTaskTest(task2, taskManager);
+
         saveEpicTest(epic1, taskManager);
         saveSubtaskTest(subtask1, taskManager);
         saveSubtaskTest(subtask2, taskManager);
 
-        updateTaskTest(task2, taskManager);
         updateEpicTest(epic2, taskManager);
         updateSubtaskTest(subtask3, taskManager);
 
@@ -39,10 +40,22 @@ public class Main {
         removeAllEpicsTest(taskManager);
     }
 
-    private static void saveTaskTest(Task task, TaskManager manager) {
-        System.out.println("saveTaskTest");
-        int id = manager.saveOrUpdate(task);
+    private static void addNewTaskTest(Task task, TaskManager manager) {
+        System.out.println("addNewTaskTest");
+        int id = manager.addNewTask(task);
         System.out.println("Сохранено: " + manager.getTaskById(id));
+        System.out.println(DELIMITER);
+    }
+
+    private static void updateTaskTest(Task task, TaskManager manager) {
+        System.out.println("updateTaskTest");
+        int id = manager.addNewTask(task);
+        Task updated = new Task(id,
+                task.getName(),
+                task.getDescription() + " А ещё с сокрытием.",
+                Status.DONE);
+        manager.updateTask(updated);
+        System.out.println("Обновлено: " + manager.getTaskById(id));
         System.out.println(DELIMITER);
     }
 
@@ -57,18 +70,6 @@ public class Main {
         System.out.println("saveSubtaskTest");
         int id = manager.saveOrUpdate(subtask);
         System.out.println("Сохранено: " + manager.getSubtaskById(id));
-        System.out.println(DELIMITER);
-    }
-
-    private static void updateTaskTest(Task task, TaskManager manager) {
-        System.out.println("updateTaskTest");
-        int id = manager.saveOrUpdate(task);
-        Task updated = new Task(id,
-                task.getName(),
-                task.getDescription() + " А ещё с сокрытием.",
-                Status.DONE);
-        manager.saveOrUpdate(updated);
-        System.out.println("Обновлено: " + manager.getTaskById(id));
         System.out.println(DELIMITER);
     }
 

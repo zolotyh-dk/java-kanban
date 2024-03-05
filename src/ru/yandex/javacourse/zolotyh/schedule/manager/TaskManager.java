@@ -56,12 +56,20 @@ public class TaskManager {
         return subtasks.get(id);
     }
 
-    public int saveOrUpdate(Task task) {
-        if (task.getId() == null) {
-            task.setId(++generatorId);
+    public int addNewTask(Task task) {
+        final int id = ++generatorId;
+        task.setId(id);
+        tasks.put(id, task);
+        return id;
+    }
+
+    public void updateTask(Task task) {
+        final int id = task.getId();
+        final Task savedTask = tasks.get(id);
+        if (savedTask == null) {
+            return;
         }
-        tasks.put(task.getId(), task);
-        return task.getId();
+        tasks.put(id, task);
     }
 
     public int saveOrUpdate(Subtask subtask) {
