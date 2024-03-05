@@ -98,13 +98,22 @@ public class TaskManager {
         updateEpicStatus(epicId);
     }
 
-    public int saveOrUpdate(Epic epic) {
-        if (epic.getId() == null) {
-            epic.setId(++generatorId);
+    public int addNewEpic(Epic epic) {
+        final int id = ++generatorId;
+        epic.setId(id);
+        epics.put(id, epic);
+        updateEpicStatus(id);
+        return id;
+    }
+
+    public void updateEpic(Epic epic) {
+        final int id = epic.getId();
+        final Epic savedEpic = epics.get(id);
+        if (savedEpic == null) {
+            return;
         }
-        epics.put(epic.getId(), epic);
-        updateEpicStatus(epic.getId());
-        return epic.getId();
+        savedEpic.setName(epic.getName());
+        savedEpic.setDescription(epic.getDescription());
     }
 
     public void removeTaskById(int id) {
@@ -124,7 +133,7 @@ public class TaskManager {
         int epicId = subtask.getEpicId();
         Epic epic = epics.get(epicId);
         epic.getSubtaskIds().remove(Integer.valueOf(id));
-        saveOrUpdate(epic);
+        updateEpicStatus(epicId);
         subtasks.remove(id);
     }
 

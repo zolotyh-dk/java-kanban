@@ -18,7 +18,7 @@ public class Main {
         addNewTaskTest(TaskUtil.task1, taskManager);
         updateTaskTest(task2, taskManager);
 
-        saveEpicTest(epic1, taskManager);
+        addNewEpicTest(epic1, taskManager);
 
 
         addNewSubtaskTest(subtask1, taskManager);
@@ -61,10 +61,19 @@ public class Main {
         System.out.println(DELIMITER);
     }
 
-    private static void saveEpicTest(Epic epic, TaskManager manager) {
+    private static void addNewEpicTest(Epic epic, TaskManager manager) {
         System.out.println("saveEpicTest");
-        int id = manager.saveOrUpdate(epic);
+        int id = manager.addNewEpic(epic);
         System.out.println("Сохранено: " + manager.getEpicById(id));
+        System.out.println(DELIMITER);
+    }
+
+    private static void updateEpicTest(Epic epic, TaskManager manager) {
+        System.out.println("updateEpicTest");
+        int id = manager.addNewEpic(epic);
+        Epic updated = new Epic(id, "Kanban-board iOS application ", epic.getDescription());
+        manager.updateEpic(updated);
+        System.out.println("Обновлено: " + manager.getEpicById(id));
         System.out.println(DELIMITER);
     }
 
@@ -82,15 +91,6 @@ public class Main {
         Subtask updated = new Subtask(id, subtask.getName(), subtask.getDescription(), Status.DONE, subtask.getEpicId());
         manager.updateSubtask(updated);
         System.out.println("Обновлено: " + manager.getSubtaskById(id));
-        System.out.println(DELIMITER);
-    }
-
-    private static void updateEpicTest(Epic epic, TaskManager manager) {
-        System.out.println("updateEpicTest");
-        int id = manager.saveOrUpdate(epic);
-        Epic updated = new Epic(id, "Kanban-board iOS application ", epic.getDescription());
-        manager.saveOrUpdate(updated);
-        System.out.println("Обновлено: " + manager.getEpicById(id));
         System.out.println(DELIMITER);
     }
 
