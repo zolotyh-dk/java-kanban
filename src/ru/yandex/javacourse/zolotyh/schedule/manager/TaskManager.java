@@ -38,7 +38,8 @@ public class TaskManager {
 
     public void removeAllSubtasks() {
         for (Epic epic : epics.values()) {
-            epic.getSubtaskIds().clear();
+            epic.clearSubtaskIds();
+            updateEpicStatus(epic.getId());
         }
         subtasks.clear();
     }
