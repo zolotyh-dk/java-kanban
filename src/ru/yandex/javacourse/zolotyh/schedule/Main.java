@@ -19,8 +19,10 @@ public class Main {
         updateTaskTest(task2, taskManager);
 
         saveEpicTest(epic1, taskManager);
-        saveSubtaskTest(subtask1, taskManager);
-        saveSubtaskTest(subtask2, taskManager);
+
+
+        addNewSubtaskTest(subtask1, taskManager);
+        addNewSubtaskTest(subtask2, taskManager);
 
         updateEpicTest(epic2, taskManager);
         updateSubtaskTest(subtask3, taskManager);
@@ -66,10 +68,20 @@ public class Main {
         System.out.println(DELIMITER);
     }
 
-    private static void saveSubtaskTest(Subtask subtask, TaskManager manager) {
+    private static void addNewSubtaskTest(Subtask subtask, TaskManager manager) {
         System.out.println("saveSubtaskTest");
-        int id = manager.saveOrUpdate(subtask);
-        System.out.println("Сохранено: " + manager.getSubtaskById(id));
+        int id = manager.addNewSubtask(subtask);
+        System.out.println("Сохранено: " + manager.getSubtaskById(id);
+        System.out.println(DELIMITER);
+    }
+
+    private static void updateSubtaskTest(Subtask subtask, TaskManager manager) {
+        System.out.println("updateSubtaskTest");
+        manager.addNewSubtask(subtask);
+        int id = subtask.getId();
+        Subtask updated = new Subtask(id, subtask.getName(), subtask.getDescription(), Status.DONE, subtask.getEpicId());
+        manager.updateSubtask(updated);
+        System.out.println("Обновлено: " + manager.getSubtaskById(id));
         System.out.println(DELIMITER);
     }
 
@@ -79,15 +91,6 @@ public class Main {
         Epic updated = new Epic(id, "Kanban-board iOS application ", epic.getDescription());
         manager.saveOrUpdate(updated);
         System.out.println("Обновлено: " + manager.getEpicById(id));
-        System.out.println(DELIMITER);
-    }
-
-    private static void updateSubtaskTest(Subtask subtask, TaskManager manager) {
-        System.out.println("updateSubtaskTest");
-        int id = manager.saveOrUpdate(subtask);
-        Subtask updated = new Subtask(id, subtask.getName(), subtask.getDescription(), Status.DONE, subtask.getEpicId());
-        manager.saveOrUpdate(updated);
-        System.out.println("Обновлено: " + manager.getSubtaskById(id));
         System.out.println(DELIMITER);
     }
 
