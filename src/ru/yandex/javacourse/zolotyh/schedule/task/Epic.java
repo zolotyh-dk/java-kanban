@@ -6,15 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
-    private List<Subtask> subtasks;
+    private List<Integer> subtaskIds = new ArrayList<>();
 
     public Epic(Integer id, String name, String description) {
         super(id, name, description, null);
-        this.subtasks = new ArrayList<>();
     }
 
-    public List<Subtask> getSubtasks() {
-        return subtasks;
+    public List<Integer> getSubtaskIds() {
+        return subtaskIds;
     }
 
     @Override
@@ -24,16 +23,7 @@ public class Epic extends Task {
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
                 ", status=" + status + '\'' +
-                ", subtasksSize=" + subtasks.size() +
+                ", subtasksSize=" + subtaskIds.size() +
                 '}';
-    }
-
-    public boolean isAllSubtasksDone() {
-        for (Subtask subtask : subtasks) {
-            if (subtask.getStatus() != Status.DONE) {
-                return false;
-            }
-        }
-        return true;
     }
 }
