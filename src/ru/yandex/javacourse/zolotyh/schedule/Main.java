@@ -114,7 +114,7 @@ public class Main {
 
     public static void removeTaskByIdTest(int id, TaskManager manager) {
         System.out.println("removeTaskByIdTest");
-        manager.removeTaskById(id);
+        manager.deleteTask(id);
         System.out.println("После удаления задачи: ");
         manager.getAllTasks().forEach(System.out::println);
         System.out.println(DELIMITER);
@@ -122,7 +122,7 @@ public class Main {
 
     public static void removeEpicByIdTest(int id, TaskManager manager) {
         System.out.println("removeEpicByIdTest");
-        manager.removeEpicById(id);
+        manager.deleteEpic(id);
         System.out.println("Все эпики после удаления:");
         manager.getAllEpics().forEach(System.out::println);
         System.out.println("Все подзадачи после удаления эпика:");
@@ -142,14 +142,14 @@ public class Main {
 
     public static void removeAllTasksTest(TaskManager manager) {
         System.out.println("removeAllTasksTest");
-        manager.removeAllTasks();
+        manager.deleteAllTasks();
         System.out.println("Удалили все задачи. Задач осталось: " + manager.getAllTasks().size());
         System.out.println(DELIMITER);
     }
 
     public static void removeAllSubtasksTest(TaskManager manager) {
         System.out.println("removeAllSubtasksTest");
-        manager.removeAllSubtasks();
+        manager.deleteAllSubtasks();
         System.out.println("Удалили все позадачи. Подзадач осталось: " + manager.getAllSubtasks().size());
         System.out.println("Все эпики после удаления подзадач:");
         manager.getAllEpics().forEach(System.out::println);
@@ -158,7 +158,7 @@ public class Main {
 
     public static void removeAllEpicsTest(TaskManager manager) {
         System.out.println("removeAllEpicsTest");
-        manager.removeAllEpics();
+        manager.deleteAllEpics();
         System.out.println("Удалили все эпики. Эпиков осталось: " + manager.getAllEpics().size());
         System.out.println("Подзадач осталось: " + manager.getAllSubtasks().size());
         System.out.println(DELIMITER);
