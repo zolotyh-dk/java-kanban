@@ -149,24 +149,26 @@ public class TaskManager {
         return result;
     }
 
-    private void updateEpicStatus(int id) {
-        final Epic epic = epics.get(id);
-        final List<Subtask> subtasksOfEpic = getSubtasksByEpic(epic);
-        if (subtasksOfEpic.isEmpty()) {
+    private void updateEpicStatus(int epicId) {
+        final Epic epic = epics.get(epicId);
+        final List<Integer> subs = epic.getSubtaskIds();
+        if (subs.isEmpty()) {
             epic.setStatus(Status.NEW);
-        } else if (isAllSubtasksDone(subtasksOfEpic)) {
-            epic.setStatus(Status.DONE);
-        } else {
-            epic.setStatus(Status.IN_PROGRESS);
+            return;
         }
-    }
-
-    private boolean isAllSubtasksDone(List<Subtask> subtasks) {
-        for (Subtask subtask : subtasks) {
-            if (subtask.getStatus() != Status.DONE) {
-                return false;
+        Status status = null;
+        for (int id : subs) {
+            final Subtask subtask = subtasks.get(id);
+            if (status == null) {
+                status = subtask.getStatus();
+                continue;
             }
+            if (status.equals(subtask.getStatus()) && !status.equals(Status.IN_PROGRESS)) {
+                continue;
+            }
+            epic.setStatus(Status.IN_PROGRESS);
+            return;
         }
-        return true;
+        epic.setStatus(status);
     }
 }
