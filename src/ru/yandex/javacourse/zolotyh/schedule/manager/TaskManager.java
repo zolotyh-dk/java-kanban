@@ -72,12 +72,15 @@ public class TaskManager {
         tasks.put(id, task);
     }
 
-    public int addNewSubtask(Subtask subtask) {
+    public Integer addNewSubtask(Subtask subtask) {
+        final int epicId = subtask.getEpicId();
+        final Epic epic = epics.get(epicId);
+        if (epic == null) {
+            return null;
+        }
         final int id = ++generatorId;
         subtask.setId(id);
         subtasks.put(id, subtask);
-        final int epicId = subtask.getEpicId();
-        final Epic epic = epics.get(epicId);
         epic.getSubtaskIds().add(id);
         updateEpicStatus(epicId);
         return subtask.getId();
