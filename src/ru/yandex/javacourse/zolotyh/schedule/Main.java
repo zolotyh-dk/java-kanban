@@ -1,7 +1,6 @@
 package ru.yandex.javacourse.zolotyh.schedule;
 
 import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
-import ru.yandex.javacourse.zolotyh.schedule.manager.InMemoryTaskManager;
 import ru.yandex.javacourse.zolotyh.schedule.manager.TaskManager;
 import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
 import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
@@ -61,6 +60,8 @@ public class Main {
         getAllTasksTest(taskManager);
         getAllEpicsTest(taskManager);
         getAllSubtasksTest(taskManager);
+
+        getHistoryCheck(taskManager);
 
         deleteTaskTest(task1.getId(), taskManager);
         deleteSubtaskTest(subtask1.getId(), taskManager);
@@ -148,6 +149,12 @@ public class Main {
     public static void getAllSubtasksTest(TaskManager manager) {
         System.out.println("getAllSubtasksTest");
         manager.getAllSubtasks().forEach(System.out::println);
+        System.out.println(DELIMITER);
+    }
+
+    public static void getHistoryCheck(TaskManager manager) {
+        System.out.println("getHistoryCheck");
+        manager.getHistory().forEach(System.out::println);
         System.out.println(DELIMITER);
     }
 
