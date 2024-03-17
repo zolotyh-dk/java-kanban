@@ -1,7 +1,7 @@
 package ru.yandex.javacourse.zolotyh.schedule;
 
 import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
-import ru.yandex.javacourse.zolotyh.schedule.manager.TaskManager;
+import ru.yandex.javacourse.zolotyh.schedule.manager.InMemoryTaskManager;
 import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
 import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;
@@ -10,7 +10,7 @@ public class Main {
     private static final String DELIMITER = "-".repeat(150);
 
     public static void main(String[] args) {
-        TaskManager taskManager = new TaskManager();
+        InMemoryTaskManager taskManager = new InMemoryTaskManager();
 
         Task task1 = new Task(null,
                 "Выучить инкапсуляцию.",
@@ -69,14 +69,14 @@ public class Main {
         deleteAllEpicsTest(taskManager);
     }
 
-    private static void addNewTaskTest(Task task, TaskManager manager) {
+    private static void addNewTaskTest(Task task, InMemoryTaskManager manager) {
         System.out.println("addNewTaskTest");
         int id = manager.addNewTask(task);
         System.out.println("Сохранено: " + manager.getTaskById(id));
         System.out.println(DELIMITER);
     }
 
-    private static void updateTaskTest(Task task, TaskManager manager) {
+    private static void updateTaskTest(Task task, InMemoryTaskManager manager) {
         System.out.println("updateTaskTest");
         int id = manager.addNewTask(task);
         Task updated = new Task(id,
@@ -88,14 +88,14 @@ public class Main {
         System.out.println(DELIMITER);
     }
 
-    private static void addNewEpicTest(Epic epic, TaskManager manager) {
+    private static void addNewEpicTest(Epic epic, InMemoryTaskManager manager) {
         System.out.println("addNewEpicTest");
         int id = manager.addNewEpic(epic);
         System.out.println("Сохранено: " + manager.getEpicById(id));
         System.out.println(DELIMITER);
     }
 
-    private static void addNewSubtaskTest(Subtask subtask, TaskManager manager) {
+    private static void addNewSubtaskTest(Subtask subtask, InMemoryTaskManager manager) {
         System.out.println("addNewSubtaskTest");
         int id = manager.addNewSubtask(subtask);
         System.out.println("Сохранено: " + manager.getSubtaskById(id));
@@ -103,7 +103,7 @@ public class Main {
         System.out.println(DELIMITER);
     }
 
-    private static void updateEpicTest(Epic epic, TaskManager manager) {
+    private static void updateEpicTest(Epic epic, InMemoryTaskManager manager) {
         System.out.println("updateEpicTest");
         int id = manager.addNewEpic(epic);
         Epic updated = new Epic(id, "Kanban-board iOS application ", epic.getDescription());
@@ -112,7 +112,7 @@ public class Main {
         System.out.println(DELIMITER);
     }
 
-    private static void updateSubtaskTest(Subtask subtask, TaskManager manager) {
+    private static void updateSubtaskTest(Subtask subtask, InMemoryTaskManager manager) {
         System.out.println("updateSubtaskTest");
         manager.addNewSubtask(subtask);
         int id = subtask.getId();
@@ -123,7 +123,7 @@ public class Main {
         System.out.println(DELIMITER);
     }
 
-    public static void getSubtasksByEpicTest(Epic epic, TaskManager manager) {
+    public static void getSubtasksByEpicTest(Epic epic, InMemoryTaskManager manager) {
         System.out.println("getSubtasksByEpicTest");
         System.out.println("Для эпика: " + epic);
         System.out.println("все подзадачи: ");
@@ -131,25 +131,25 @@ public class Main {
         System.out.println(DELIMITER);
     }
 
-    private static void getAllTasksTest(TaskManager manager) {
+    private static void getAllTasksTest(InMemoryTaskManager manager) {
         System.out.println("getAllTasksTest()");
         manager.getAllTasks().forEach(System.out::println);
         System.out.println(DELIMITER);
     }
 
-    private static void getAllEpicsTest(TaskManager manager) {
+    private static void getAllEpicsTest(InMemoryTaskManager manager) {
         System.out.println("getAllEpicsTest");
         manager.getAllEpics().forEach(System.out::println);
         System.out.println(DELIMITER);
     }
 
-    public static void getAllSubtasksTest(TaskManager manager) {
+    public static void getAllSubtasksTest(InMemoryTaskManager manager) {
         System.out.println("getAllSubtasksTest");
         manager.getAllSubtasks().forEach(System.out::println);
         System.out.println(DELIMITER);
     }
 
-    public static void deleteTaskTest(int id, TaskManager manager) {
+    public static void deleteTaskTest(int id, InMemoryTaskManager manager) {
         System.out.println("deleteTaskTest");
         manager.deleteTask(id);
         System.out.println("После удаления задачи: ");
@@ -157,7 +157,7 @@ public class Main {
         System.out.println(DELIMITER);
     }
 
-    public static void deleteSubtaskTest(int id, TaskManager manager) {
+    public static void deleteSubtaskTest(int id, InMemoryTaskManager manager) {
         System.out.println("deleteSubtaskTest");
         manager.deleteSubtask(id);
         System.out.println("Все подзадачи после удаления:");
@@ -167,7 +167,7 @@ public class Main {
         System.out.println(DELIMITER);
     }
 
-    public static void deleteEpicTest(int id, TaskManager manager) {
+    public static void deleteEpicTest(int id, InMemoryTaskManager manager) {
         System.out.println("deleteEpicTest");
         manager.deleteEpic(id);
         System.out.println("Все эпики после удаления:");
@@ -177,14 +177,14 @@ public class Main {
         System.out.println(DELIMITER);
     }
 
-    public static void deleteAllTasksTest(TaskManager manager) {
+    public static void deleteAllTasksTest(InMemoryTaskManager manager) {
         System.out.println("deleteAllTasksTest");
         manager.deleteAllTasks();
         System.out.println("Удалили все задачи. Задач осталось: " + manager.getAllTasks().size());
         System.out.println(DELIMITER);
     }
 
-    public static void deleteAllSubtasksTest(TaskManager manager) {
+    public static void deleteAllSubtasksTest(InMemoryTaskManager manager) {
         System.out.println("deleteAllSubtasksTest");
         manager.deleteAllSubtasks();
         System.out.println("Удалили все позадачи. Подзадач осталось: " + manager.getAllSubtasks().size());
@@ -193,7 +193,7 @@ public class Main {
         System.out.println(DELIMITER);
     }
 
-    public static void deleteAllEpicsTest(TaskManager manager) {
+    public static void deleteAllEpicsTest(InMemoryTaskManager manager) {
         System.out.println("deleteAllEpicsTest");
         manager.deleteAllEpics();
         System.out.println("Удалили все эпики. Эпиков осталось: " + manager.getAllEpics().size());
