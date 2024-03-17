@@ -4,6 +4,7 @@ import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
 import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
 import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;
+import ru.yandex.javacourse.zolotyh.schedule.util.Managers;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +15,11 @@ public class InMemoryTaskManager implements TaskManager {
     private final HashMap<Integer, Task> tasks = new HashMap<>();
     private final HashMap<Integer, Epic> epics = new HashMap<>();
     private final HashMap<Integer, Subtask> subtasks = new HashMap<>();
-    private final ArrayList<Task> history = new ArrayList<>(10);
+    private final HistoryManager historyManager = Managers.getDefaultHistory();
+
+    public HistoryManager getHistoryManager() {
+        return historyManager;
+    }
 
     @Override
     public List<Task> getAllTasks() {
@@ -55,7 +60,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Task getTaskById(int id) {
         Task task = tasks.get(id);
         if (task != null) {
-            addToHistory(task);
+            historyManager.add(task);
         }
         return task;
     }
@@ -64,7 +69,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Epic getEpicById(int id) {
         Epic epic = epics.get(id);
         if (epic != null) {
-            addToHistory(epic);
+            historyManager.add(epic);
         }
         return epic;
     }
@@ -73,7 +78,7 @@ public class InMemoryTaskManager implements TaskManager {
     public Subtask getSubtaskById(int id) {
         Subtask subtask =  subtasks.get(id);
         if (subtask != null) {
-            addToHistory(subtask);
+            historyManager.add(subtask);
         }
         return subtask;
     }
@@ -202,17 +207,5 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
         epic.setStatus(status);
-    }
-
-    @Override
-    public List<Task> getHistory() {
-        return history;
-    }
-
-    private void addToHistory(Task task) {
-        if (history.size() >= 10) {
-            history.removeFirst();
-        }
-        history.add(task);
     }
 }

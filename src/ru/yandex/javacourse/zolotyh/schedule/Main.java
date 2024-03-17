@@ -1,6 +1,9 @@
 package ru.yandex.javacourse.zolotyh.schedule;
 
 import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
+import ru.yandex.javacourse.zolotyh.schedule.manager.HistoryManager;
+import ru.yandex.javacourse.zolotyh.schedule.manager.InMemoryHistoryManager;
+import ru.yandex.javacourse.zolotyh.schedule.manager.InMemoryTaskManager;
 import ru.yandex.javacourse.zolotyh.schedule.manager.TaskManager;
 import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
 import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
@@ -154,7 +157,8 @@ public class Main {
 
     public static void getHistoryCheck(TaskManager manager) {
         System.out.println("getHistoryCheck");
-        manager.getHistory().forEach(System.out::println);
+        InMemoryTaskManager inMemoryTaskManager = (InMemoryTaskManager) manager;
+        inMemoryTaskManager.getHistoryManager().getHistory().forEach(System.out::println);
         System.out.println(DELIMITER);
     }
 
