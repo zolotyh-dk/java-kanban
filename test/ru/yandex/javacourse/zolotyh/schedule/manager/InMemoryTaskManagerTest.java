@@ -27,6 +27,9 @@ class InMemoryTaskManagerTest {
         final Task savedTask = taskManager.getTaskById(id);
         assertNotNull(savedTask, "Задача не найдена.");
         assertEquals(task, savedTask, "Задачи не совпадают.");
+        assertEquals(task.getName(), savedTask.getName(), "Имя задачи не совпадает.");
+        assertEquals(task.getDescription(), savedTask.getDescription(), "Имя задачи не совпадает.");
+        assertEquals(task.getStatus(), savedTask.getStatus(), "Статус задачи не совпадает.");
 
         final List<Task> tasks = taskManager.getAllTasks();
         assertNotNull(tasks, "Задачи не возвращаются.");
