@@ -22,7 +22,7 @@ class InMemoryTaskManagerTest {
 
     @Test
     public void addNewTask() {
-        Task task = new Task(null, "Test addNewTask", "Test addNewTask description", Status.NEW);
+        final Task task = new Task(null, "Новая задача из теста addNewTask", "Описание задачи", Status.NEW);
         final int id = taskManager.addNewTask(task);
         final Task savedTask = taskManager.getTaskById(id);
         assertNotNull(savedTask, "Задача не найдена.");
