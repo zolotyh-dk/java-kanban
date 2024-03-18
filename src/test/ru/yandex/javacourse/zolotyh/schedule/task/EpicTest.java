@@ -1,7 +1,6 @@
 package ru.yandex.javacourse.zolotyh.schedule.task;
 
 import org.junit.jupiter.api.Test;
-import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
 
 import static org.junit.jupiter.api.Assertions.*;
 
