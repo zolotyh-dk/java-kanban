@@ -102,4 +102,28 @@ class InMemoryHistoryManagerTest {
                 "Описание исходного эпика не сохранилось в истории");
         assertEquals(original.getStatus(), history.get(0).getStatus(), "Статус исходного эпика не сохранился в истории");
     }
+
+    @Test
+    public void shouldContainOriginalSubtaskAfterUpdate() {
+        final Epic epic = new Epic(null, "Эпик", "Описание эпика");
+        final int epicId = taskManager.addNewEpic(epic);
+
+        final Subtask original = new Subtask(null, "Исходная подзадача",
+                "Описание исходной подзадачи", Status.DONE, epicId);
+        final int originalId = taskManager.addNewSubtask(original);
+        taskManager.getSubtaskById(originalId);
+
+        final Subtask updated = new Subtask(originalId, "Обновленная подзадача",
+                "Описание обновленной подзадачи", Status.IN_PROGRESS, epicId);
+        taskManager.updateSubtask(updated);
+
+        final List<Task> history = historyManager.getHistory();
+
+        assertEquals(original, history.get(0), "Исходная подзадача не сохранилсась в истории после обновления.");
+        assertEquals(original.getName(), history.get(0).getName(), "Имя исходной подзадачи не сохранилось в истории");
+        assertEquals(original.getDescription(), history.get(0).getDescription(),
+                "Описание исходной подзадачи не сохранилось в истории");
+        assertEquals(original.getStatus(), history.get(0).getStatus(),
+                "Статус исходной подзадачи не сохранился в истории");
+    }
 }
