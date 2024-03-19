@@ -2,7 +2,6 @@ package ru.yandex.javacourse.zolotyh.schedule.manager;
 
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
