@@ -1,7 +1,6 @@
 package ru.yandex.javacourse.zolotyh.schedule;
 
 import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
-import ru.yandex.javacourse.zolotyh.schedule.manager.HistoryManager;
 import ru.yandex.javacourse.zolotyh.schedule.manager.TaskManager;
 import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
 import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
@@ -11,7 +10,6 @@ import ru.yandex.javacourse.zolotyh.schedule.util.Managers;
 public class Main {
     private static final String DELIMITER = "-".repeat(150) + '\n';
     private static final TaskManager taskManager = Managers.getDefault();
-    private static final HistoryManager historyManager = taskManager.getHistoryManager();
 
     public static void main(String[] args) {
         initialiseRepository();
@@ -71,7 +69,7 @@ public class Main {
         System.out.println(DELIMITER);
 
         System.out.println("История просмотров:");
-        for (Task task : historyManager.getHistory()) {
+        for (Task task : taskManager.getHistory()) {
             System.out.println(task);
         }
     }

@@ -13,13 +13,11 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryHistoryManagerTest {
-    private static HistoryManager historyManager;
     private static TaskManager taskManager;
 
     @BeforeEach
     public void beforeEach() {
         taskManager = Managers.getDefault();
-        historyManager = taskManager.getHistoryManager();
     }
 
     @Test
@@ -38,7 +36,7 @@ class InMemoryHistoryManagerTest {
         taskManager.getEpicById(epicId);
         taskManager.getSubtaskById(subtaskId);
 
-        final List<Task> history = historyManager.getHistory();
+        final List<Task> history = taskManager.getHistory();
         assertEquals(3, history.size(), "Размер истории не совпадает.");
         assertEquals(task, history.get(0), "Задача не попала в историю.");
         assertEquals(epic, history.get(1), "Эпик не попал в историю.");
@@ -60,7 +58,7 @@ class InMemoryHistoryManagerTest {
         final Task eleventh = new Task(null, "Одиннадцатая задача в истории", "Описание задачи", Status.NEW);
         final int eleventhId = taskManager.addNewTask(eleventh);
         taskManager.getTaskById(eleventhId);
-        final List<Task> history = historyManager.getHistory();
+        final List<Task> history = taskManager.getHistory();
 
         assertEquals(10, history.size(), "Длина истории не совпадает.");
         assertFalse(history.contains(first));
@@ -76,13 +74,13 @@ class InMemoryHistoryManagerTest {
         final Task updated = new Task(originalId, "Обновленная задача", "Описание задачи", Status.IN_PROGRESS);
         taskManager.updateTask(updated);
 
-        final List<Task> history = historyManager.getHistory();
+        final List<Task> history = taskManager.getHistory();
 
         assertEquals(original, history.get(0), "Исходная задача не сохранилась в истории после обновления.");
         assertEquals(original.getName(), history.get(0).getName(), "Имя исходной задачи не сохранилось в истории");
         assertEquals(original.getDescription(), history.get(0).getDescription(),
                 "Описание исходной задачи не сохранилось в истории");
-        assertEquals(original.getStatus(), history.get(0).getStatus(), "Статус исходной задачи не сохранилось в истории");
+        assertEquals(original.getStatus(), history.get(0).getStatus(), "Статус исходной задачи не сохранился в истории");
     }
 
     @Test
@@ -94,7 +92,7 @@ class InMemoryHistoryManagerTest {
         final Epic updated = new Epic(originalId, "Обновленный эпик", "Описание эпика");
         taskManager.updateEpic(updated);
 
-        final List<Task> history = historyManager.getHistory();
+        final List<Task> history = taskManager.getHistory();
 
         assertEquals(original, history.get(0), "Исходный эпик не сохранился в истории после обновления.");
         assertEquals(original.getName(), history.get(0).getName(), "Имя исходного эпика не сохранилось в истории");
@@ -117,7 +115,7 @@ class InMemoryHistoryManagerTest {
                 "Описание обновленной подзадачи", Status.IN_PROGRESS, epicId);
         taskManager.updateSubtask(updated);
 
-        final List<Task> history = historyManager.getHistory();
+        final List<Task> history = taskManager.getHistory();
 
         assertEquals(original, history.get(0), "Исходная подзадача не сохранилсась в истории после обновления.");
         assertEquals(original.getName(), history.get(0).getName(), "Имя исходной подзадачи не сохранилось в истории");
