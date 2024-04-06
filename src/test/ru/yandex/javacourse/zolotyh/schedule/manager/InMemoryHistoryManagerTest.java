@@ -44,25 +44,29 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    public void shouldRemoveFirstTaskInHistoryWhenSizeMoreThen10() {
-        final Task first = new Task(null, "Первая задача в истории", "Описание задачи", Status.NEW);
-        final int firstId = taskManager.addNewTask(first);
-        taskManager.getTaskById(firstId);
+    public void shouldNotContainDuplicates() {
+        final Task task = new Task(null, "Новая задача", "Описание задачи", Status.NEW);
+        final int taskId = taskManager.addNewTask(task);
 
-        for (int i = 0; i < 9; i++) {
-            Task task = new Task(null, "Очередная задча в истории", "Описание задчи", Status.NEW);
-            int id = taskManager.addNewTask(task);
-            taskManager.getTaskById(id);
-        }
+        final Epic epic = new Epic(null, "Новый эпик", "Описание эпика");
+        final int epicId = taskManager.addNewEpic(epic);
 
-        final Task eleventh = new Task(null, "Одиннадцатая задача в истории", "Описание задачи", Status.NEW);
-        final int eleventhId = taskManager.addNewTask(eleventh);
-        taskManager.getTaskById(eleventhId);
+        final Subtask subtask = new Subtask(null, "Новая подзадача", "Описание подзадачи",
+                Status.DONE, epicId);
+        final int subtaskId = taskManager.addNewSubtask(subtask);
+
+        taskManager.getTaskById(taskId);
+        taskManager.getEpicById(epicId);
+        taskManager.getSubtaskById(subtaskId);
+        taskManager.getTaskById(taskId);
+        taskManager.getEpicById(epicId);
+        taskManager.getSubtaskById(subtaskId);
+
         final List<Task> history = taskManager.getHistory();
-
-        assertEquals(10, history.size(), "Длина истории не совпадает.");
-        assertFalse(history.contains(first));
-        assertEquals(eleventh, history.get(9));
+        assertEquals(3, history.size(), "Размер истории не совпадает.");
+        assertEquals(task, history.get(0), "Задача не попала в историю.");
+        assertEquals(epic, history.get(1), "Эпик не попал в историю.");
+        assertEquals(subtask, history.get(2), "Подзадача не попала в историю.");
     }
 
     @Test
