@@ -37,7 +37,7 @@ public class Main {
         for (Task task : taskManager.getAllTasks()) {
             System.out.println(task);
         }
-        System.out.println("Эпики:");
+        System.out.println("\nЭпики:");
         for (Epic epic : taskManager.getAllEpics()) {
             System.out.println(epic);
 
@@ -45,7 +45,7 @@ public class Main {
                 System.out.println("--> " + task);
             }
         }
-        System.out.println("Подзадачи:");
+        System.out.println("\nПодзадачи:");
         for (Task subtask : taskManager.getAllSubtasks()) {
             System.out.println(subtask);
         }
