@@ -21,23 +21,23 @@ class InMemoryHistoryManagerTest {
     }
 
     //Тесты на добавление задач в историю ⬇️
-
     @Test
     public void shouldAddTasksToHistoryWhenGetById() {
+        // Создаем задачу, эпик и подзадачу
         final Task task = new Task(null, "Новая задача", "Описание задачи", Status.NEW);
         final int taskId = taskManager.addNewTask(task);
-
         final Epic epic = new Epic(null, "Новый эпик", "Описание эпика");
         final int epicId = taskManager.addNewEpic(epic);
-
         final Subtask subtask = new Subtask(null, "Новая подзадача", "Описание подзадачи",
                 Status.DONE, epicId);
         final int subtaskId = taskManager.addNewSubtask(subtask);
 
+        // Добавляем задачу, эпик и подзадачу в историю
         taskManager.getTaskById(taskId);
         taskManager.getEpicById(epicId);
         taskManager.getSubtaskById(subtaskId);
 
+        // Получаем историю и проверяем, что все объекты добавлены в историю
         final List<Task> history = taskManager.getHistory();
         assertEquals(3, history.size(), "Размер истории не совпадает.");
         assertEquals(task, history.get(0), "Задача не попала в историю.");
@@ -47,40 +47,44 @@ class InMemoryHistoryManagerTest {
 
     @Test
     public void shouldNotContainDuplicates() {
+        // Создаем задачу, эпик и подзадачу
         final Task task = new Task(null, "Новая задача", "Описание задачи", Status.NEW);
         final int taskId = taskManager.addNewTask(task);
-
         final Epic epic = new Epic(null, "Новый эпик", "Описание эпика");
         final int epicId = taskManager.addNewEpic(epic);
-
         final Subtask subtask = new Subtask(null, "Новая подзадача", "Описание подзадачи",
                 Status.DONE, epicId);
         final int subtaskId = taskManager.addNewSubtask(subtask);
 
-        taskManager.getTaskById(taskId);
-        taskManager.getEpicById(epicId);
-        taskManager.getSubtaskById(subtaskId);
+        // Добавляем задачу, эпик и подзадачу в историю
         taskManager.getTaskById(taskId);
         taskManager.getEpicById(epicId);
         taskManager.getSubtaskById(subtaskId);
 
+        // Добавляем объекты второй раз
+        taskManager.getTaskById(taskId);
+        taskManager.getEpicById(epicId);
+        taskManager.getSubtaskById(subtaskId);
+
+        // Проверяем, что в истории нет дубликатов
         final List<Task> history = taskManager.getHistory();
         assertEquals(3, history.size(), "Размер истории не совпадает.");
     }
 
     //Тесты на обновление задач в истории ⬇️
-
     @Test
     public void shouldContainOriginalTaskAfterUpdate() {
+        // Создаем исходную задачу и обновленную задачу
         final Task original = new Task(null, "Исходная задача", "Описание задачи", Status.NEW);
         final int originalId = taskManager.addNewTask(original);
         taskManager.getTaskById(originalId);
-
         final Task updated = new Task(originalId, "Обновленная задача", "Описание задачи", Status.IN_PROGRESS);
+
+        // Обновляем задачу
         taskManager.updateTask(updated);
 
+        // Получаем историю и проверяем, что исходная задача сохранилась в истории
         final List<Task> history = taskManager.getHistory();
-
         assertEquals(original, history.get(0), "Исходная задача не сохранилась в истории после обновления.");
         assertEquals(original.getName(), history.get(0).getName(), "Имя исходной задачи не сохранилось в истории");
         assertEquals(original.getDescription(), history.get(0).getDescription(),
@@ -90,15 +94,17 @@ class InMemoryHistoryManagerTest {
 
     @Test
     public void shouldContainOriginalEpicAfterUpdate() {
+        // Создаем исходный эпик и обновленный эпик
         final Epic original = new Epic(null, "Исходный эпик", "Описание эпика");
         final int originalId = taskManager.addNewEpic(original);
         taskManager.getEpicById(originalId);
-
         final Epic updated = new Epic(originalId, "Обновленный эпик", "Описание эпика");
+
+        // Обновляем эпик
         taskManager.updateEpic(updated);
 
+        // Получаем историю и проверяем, что исходный эпик сохранился в истории
         final List<Task> history = taskManager.getHistory();
-
         assertEquals(original, history.get(0), "Исходный эпик не сохранился в истории после обновления.");
         assertEquals(original.getName(), history.get(0).getName(), "Имя исходного эпика не сохранилось в истории");
         assertEquals(original.getDescription(), history.get(0).getDescription(),
@@ -108,20 +114,21 @@ class InMemoryHistoryManagerTest {
 
     @Test
     public void shouldContainOriginalSubtaskAfterUpdate() {
+        // Создаем исходную эпик, подзадачу для него и обновленную подзадачу для того же эпика
         final Epic epic = new Epic(null, "Эпик", "Описание эпика");
         final int epicId = taskManager.addNewEpic(epic);
-
         final Subtask original = new Subtask(null, "Исходная подзадача",
                 "Описание исходной подзадачи", Status.DONE, epicId);
         final int originalId = taskManager.addNewSubtask(original);
         taskManager.getSubtaskById(originalId);
-
         final Subtask updated = new Subtask(originalId, "Обновленная подзадача",
                 "Описание обновленной подзадачи", Status.IN_PROGRESS, epicId);
+
+        // Обновляем подзадачу
         taskManager.updateSubtask(updated);
 
+        // Получаем историю и проверяем, что исходная подзадача сохранилась в истории
         final List<Task> history = taskManager.getHistory();
-
         assertEquals(original, history.get(0), "Исходная подзадача не сохранилсась в истории после обновления.");
         assertEquals(original.getName(), history.get(0).getName(), "Имя исходной подзадачи не сохранилось в истории");
         assertEquals(original.getDescription(), history.get(0).getDescription(),
@@ -131,34 +138,36 @@ class InMemoryHistoryManagerTest {
     }
 
     //Тесты на удаление задач из истории ⬇️
-
     @Test
     public void shouldRemoveTaskFromHistoryWhenTaskRemovedFromRepository() {
+        // Создаем задачу, эпик и подзадачу
         final Task task = new Task(null, "Новая задача", "Описание задачи", Status.NEW);
         final int taskId = taskManager.addNewTask(task);
-
         final Epic epic = new Epic(null, "Новый эпик", "Описание эпика");
         final int epicId = taskManager.addNewEpic(epic);
-
         final Subtask subtask = new Subtask(null, "Новая подзадача", "Описание подзадачи",
                 Status.DONE, epicId);
         final int subtaskId = taskManager.addNewSubtask(subtask);
 
+        // Добавляем задачу, эпик и подзадачу в историю
         taskManager.getTaskById(taskId);
         taskManager.getEpicById(epicId);
         taskManager.getSubtaskById(subtaskId);
 
+        // Удаляем задачу, получаем историю и проверяем, что задача удалена из истории
         taskManager.deleteTask(taskId);
         List<Task> history = taskManager.getHistory();
         assertEquals(2, history.size(), "Размер истории не совпадает.");
         assertEquals(epic, history.get(0), "Эпик не сместился к началу истории просмотров.");
         assertEquals(subtask, history.get(1), "Подзадача не сместилась к началу истории просмотров");
 
+        // Удаляем подзадачу, получаем историю и проверяем, что подзадача удалена из истории
         taskManager.deleteSubtask(subtaskId);
         history = taskManager.getHistory();
         assertEquals(1, history.size(), "Размер истории не совпадает.");
         assertEquals(epic, history.get(0), "Эпик отсутствует в истории.");
 
+        // Удаляем эпик, получаем историю и проверяем, что история пуста
         taskManager.deleteEpic(epicId);
         history = taskManager.getHistory();
         assertTrue(history.isEmpty(), "История должна быть пустой.");
@@ -207,28 +216,33 @@ class InMemoryHistoryManagerTest {
     //Тесты для работы с пустой историей ⬇️
     @Test
     public void historyShouldBeEmptyWhenNoTasksAdded() {
+        // Получаем историю и проверяем, что история пуста
         final List<Task> history = taskManager.getHistory();
         assertTrue(history.isEmpty(), "История должна быть пустой.");
     }
 
     @Test
     public void removeNotExistedTaskFromHistory() {
+        // Создаем новую задачу, эпик и подзадачу
         final Task task = new Task(null, "Новая задача", "Описание задачи", Status.NEW);
         final int taskId = taskManager.addNewTask(task);
-
         final Epic epic = new Epic(null, "Новый эпик", "Описание эпика");
         final int epicId = taskManager.addNewEpic(epic);
-
         final Subtask subtask = new Subtask(null, "Новая подзадача", "Описание подзадачи",
                 Status.DONE, epicId);
         final int subtaskId = taskManager.addNewSubtask(subtask);
 
+        // Удаляем задачу из репозитория, проверяем что история пуста
         taskManager.deleteTask(taskId);
         List<Task> history = taskManager.getHistory();
         assertTrue(history.isEmpty(), "История должна быть пустой.");
+
+        // Удаляем подзадачу из репозитория, проверяем что история пуста
         taskManager.deleteSubtask(subtaskId);
         history = taskManager.getHistory();
         assertTrue(history.isEmpty(), "История должна быть пустой.");
+
+        // Удаляем эпик из репозитория, проверяем что история пуста
         taskManager.deleteEpic(epicId);
         history = taskManager.getHistory();
         assertTrue(history.isEmpty(), "История должна быть пустой.");
