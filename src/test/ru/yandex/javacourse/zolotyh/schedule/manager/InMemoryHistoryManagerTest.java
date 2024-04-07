@@ -164,6 +164,46 @@ class InMemoryHistoryManagerTest {
         assertTrue(history.isEmpty(), "История должна быть пустой.");
     }
 
+    @Test
+    public void shouldDeleteTasksFromHistoryWhenDeleteAllFromRepository() {
+        // Создание задач
+        final Task task1 = new Task(null, "Новая задача 1", "Описание задачи 1", Status.NEW);
+        final int task1Id = taskManager.addNewTask(task1);
+        final Task task2 = new Task(null, "Новая задача 2", "Описание задачи 2", Status.NEW);
+        final int task2Id = taskManager.addNewTask(task2);
+
+        // Создание эпиков
+        final Epic epic1 = new Epic(null, "Новый эпик 1", "Описание эпика 1");
+        final int epic1Id = taskManager.addNewEpic(epic1);
+        final Epic epic2 = new Epic(null, "Новый эпик 2", "Описание эпика 2");
+        final int epic2Id = taskManager.addNewEpic(epic2);
+
+        // Создание подзадач
+        final Subtask subtask1 = new Subtask(null, "Новая подзадача 1", "Описание подзадачи 1",
+                Status.DONE, epic1Id);
+        final int subtask1Id = taskManager.addNewSubtask(subtask1);
+        final Subtask subtask2 = new Subtask(null, "Новая подзадача 2", "Описание подзадачи 2",
+                Status.DONE, epic2Id);
+        final int subtask2Id = taskManager.addNewSubtask(subtask2);
+
+        // Добавление задач, эпиков и подзадач в историю
+        taskManager.getTaskById(task1Id);
+        taskManager.getTaskById(task2Id);
+        taskManager.getEpicById(epic1Id);
+        taskManager.getEpicById(epic2Id);
+        taskManager.getSubtaskById(subtask1Id);
+        taskManager.getSubtaskById(subtask2Id);
+
+        // Удаление всех задач, эпиков и подзадач
+        taskManager.deleteAllTasks();
+        taskManager.deleteAllSubtasks();
+        taskManager.deleteAllEpics();
+
+        // Проверка, что история теперь пуста
+        List<Task> history = taskManager.getHistory();
+        assertTrue(history.isEmpty(), "История должна быть пустой.");
+    }
+
     //Тесты для работы с пустой историей ⬇️
     @Test
     public void historyShouldBeEmptyWhenNoTasksAdded() {
