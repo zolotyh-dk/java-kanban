@@ -199,4 +199,20 @@ class InMemoryTaskManagerTest {
         assertEquals(0, taskManager.getAllSubtasks().size(), "Список подзадач не пустой.");
         assertEquals(0, taskManager.getAllEpics().size(), "Список эпиков не пустой.");
     }
+
+    @Test
+    public void epicShouldNotContainRemovedSubtaskIds() {
+        // Создаем эпик и добавляем подзадачу
+        final Epic epic = new Epic(null, "Эпик", "Описание эпика");
+        final int epicId = taskManager.addNewEpic(epic);
+        final Subtask subtask = new Subtask(null, "Подзадача", "Описание подзадачи", Status.DONE, epicId);
+        final int subtaskId = taskManager.addNewSubtask(subtask);
+
+        // Удаляем подзадачу
+        taskManager.deleteSubtask(subtaskId);
+
+        // Получаем обновленный эпик и проверяем, что он больше не содержит удаленного id подзадачи
+        final Epic updatedEpic = taskManager.getEpicById(epicId);
+        assertFalse(updatedEpic.getSubtaskIds().contains(subtaskId), "Эпик не должен содержать удаленный id подзадачи.");
+    }
 }
