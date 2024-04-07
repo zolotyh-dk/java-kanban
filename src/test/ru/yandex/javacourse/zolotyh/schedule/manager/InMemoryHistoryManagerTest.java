@@ -20,6 +20,8 @@ class InMemoryHistoryManagerTest {
         taskManager = Managers.getDefault();
     }
 
+    //Тесты на добавление задач в историю ⬇️
+
     @Test
     public void shouldAddTasksToHistoryWhenGetById() {
         final Task task = new Task(null, "Новая задача", "Описание задачи", Status.NEW);
@@ -65,6 +67,8 @@ class InMemoryHistoryManagerTest {
         final List<Task> history = taskManager.getHistory();
         assertEquals(3, history.size(), "Размер истории не совпадает.");
     }
+
+    //Тесты на обновление задач в истории ⬇️
 
     @Test
     public void shouldContainOriginalTaskAfterUpdate() {
@@ -126,6 +130,8 @@ class InMemoryHistoryManagerTest {
                 "Статус исходной подзадачи не сохранился в истории");
     }
 
+    //Тесты на удаление задач из истории ⬇️
+
     @Test
     public void shouldRemoveTaskFromHistoryWhenTaskRemovedFromRepository() {
         final Task task = new Task(null, "Новая задача", "Описание задачи", Status.NEW);
@@ -155,6 +161,36 @@ class InMemoryHistoryManagerTest {
 
         taskManager.deleteEpic(epicId);
         history = taskManager.getHistory();
-        assertTrue(history.isEmpty(), "История не пуста.");
+        assertTrue(history.isEmpty(), "История должна быть пустой.");
+    }
+
+    //Тесты для работы с пустой историей ⬇️
+    @Test
+    public void historyShouldBeEmptyWhenNoTasksAdded() {
+        final List<Task> history = taskManager.getHistory();
+        assertTrue(history.isEmpty(), "История должна быть пустой.");
+    }
+
+    @Test
+    public void removeNotExistedTaskFromHistory() {
+        final Task task = new Task(null, "Новая задача", "Описание задачи", Status.NEW);
+        final int taskId = taskManager.addNewTask(task);
+
+        final Epic epic = new Epic(null, "Новый эпик", "Описание эпика");
+        final int epicId = taskManager.addNewEpic(epic);
+
+        final Subtask subtask = new Subtask(null, "Новая подзадача", "Описание подзадачи",
+                Status.DONE, epicId);
+        final int subtaskId = taskManager.addNewSubtask(subtask);
+
+        taskManager.deleteTask(taskId);
+        List<Task> history = taskManager.getHistory();
+        assertTrue(history.isEmpty(), "История должна быть пустой.");
+        taskManager.deleteSubtask(subtaskId);
+        history = taskManager.getHistory();
+        assertTrue(history.isEmpty(), "История должна быть пустой.");
+        taskManager.deleteEpic(epicId);
+        history = taskManager.getHistory();
+        assertTrue(history.isEmpty(), "История должна быть пустой.");
     }
 }
