@@ -26,8 +26,8 @@ public class Main {
         Epic epic = new Epic(null, "Эпик с тремя подзадачами", "Описание эпика с тремя подзадачами");
         taskManager.addNewEpic(epic);
         Subtask subtask1 = new Subtask(null, "Подзадача 1", "Описание подзадачи 1", Status.NEW, epic.getId());
-        Subtask subtask2 =new Subtask(null, "Подзадача 2", "Описание подзадачи 2", Status.IN_PROGRESS, epic.getId());
-        Subtask subtask3 =new Subtask(null, "Подзадача 3", "Описание подзадачи 3", Status.DONE, epic.getId());
+        Subtask subtask2 = new Subtask(null, "Подзадача 2", "Описание подзадачи 2", Status.IN_PROGRESS, epic.getId());
+        Subtask subtask3 = new Subtask(null, "Подзадача 3", "Описание подзадачи 3", Status.DONE, epic.getId());
         taskManager.addNewSubtask(subtask1);
         taskManager.addNewSubtask(subtask2);
         taskManager.addNewSubtask(subtask3);
