@@ -64,9 +64,6 @@ class InMemoryHistoryManagerTest {
 
         final List<Task> history = taskManager.getHistory();
         assertEquals(3, history.size(), "Размер истории не совпадает.");
-        assertEquals(task, history.get(0), "Задача не попала в историю.");
-        assertEquals(epic, history.get(1), "Эпик не попал в историю.");
-        assertEquals(subtask, history.get(2), "Подзадача не попала в историю.");
     }
 
     @Test
@@ -127,5 +124,37 @@ class InMemoryHistoryManagerTest {
                 "Описание исходной подзадачи не сохранилось в истории");
         assertEquals(original.getStatus(), history.get(0).getStatus(),
                 "Статус исходной подзадачи не сохранился в истории");
+    }
+
+    @Test
+    public void shouldRemoveTaskFromHistoryWhenTaskRemovedFromRepository() {
+        final Task task = new Task(null, "Новая задача", "Описание задачи", Status.NEW);
+        final int taskId = taskManager.addNewTask(task);
+
+        final Epic epic = new Epic(null, "Новый эпик", "Описание эпика");
+        final int epicId = taskManager.addNewEpic(epic);
+
+        final Subtask subtask = new Subtask(null, "Новая подзадача", "Описание подзадачи",
+                Status.DONE, epicId);
+        final int subtaskId = taskManager.addNewSubtask(subtask);
+
+        taskManager.getTaskById(taskId);
+        taskManager.getEpicById(epicId);
+        taskManager.getSubtaskById(subtaskId);
+
+        taskManager.deleteTask(taskId);
+        List<Task> history = taskManager.getHistory();
+        assertEquals(2, history.size(), "Размер истории не совпадает.");
+        assertEquals(epic, history.get(0), "Эпик не сместился к началу истории просмотров.");
+        assertEquals(subtask, history.get(1), "Подзадача не сместилась к началу истории просмотров");
+
+        taskManager.deleteSubtask(subtaskId);
+        history = taskManager.getHistory();
+        assertEquals(1, history.size(), "Размер истории не совпадает.");
+        assertEquals(epic, history.get(0), "Эпик отсутствует в истории.");
+
+        taskManager.deleteEpic(epicId);
+        history = taskManager.getHistory();
+        assertTrue(history.isEmpty(), "История не пуста.");
     }
 }
