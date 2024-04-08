@@ -5,26 +5,24 @@ import ru.yandex.javacourse.zolotyh.schedule.task.Task;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private final HashMap<Integer, Node> history = new HashMap<>();
+    private final Map<Integer, Node> history = new HashMap<>();
     private Node first;
     private Node last;
 
     @Override
     public void add(Task task) {
         final int id = task.getId();
-        final Node existingNode = history.get(id);
-        if (existingNode != null) {
-            removeNode(existingNode);
-        }
+        remove(id);
         linkLast(task);
         history.put(id, last);
     }
 
     @Override
     public void remove(int id) {
-        final Node existingNode = history.get(id);
+        final Node existingNode = history.remove(id);
         if (existingNode != null) {
             removeNode(existingNode);
         }
@@ -70,8 +68,6 @@ public class InMemoryHistoryManager implements HistoryManager {
         } else {
             next.prev = prev;
         }
-
-        history.remove(node.element.getId());
     }
 
     private static class Node {
