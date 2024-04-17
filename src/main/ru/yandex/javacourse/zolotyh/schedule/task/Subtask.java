@@ -1,6 +1,7 @@
 package ru.yandex.javacourse.zolotyh.schedule.task;
 
 import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
+import ru.yandex.javacourse.zolotyh.schedule.enums.TaskType;
 
 public class Subtask extends Task {
     private Integer epicId;
@@ -20,12 +21,7 @@ public class Subtask extends Task {
 
     @Override
     public String toString() {
-        return "Subtask{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status + '\'' +
-                ", epicId=" + epicId +
-                '}';
+        final String format = "%d,%s,%s,%s,%s,%d";
+        return String.format(format, getId(), TaskType.EPIC, getName(), getStatus(), getDescription(), epicId);
     }
 }

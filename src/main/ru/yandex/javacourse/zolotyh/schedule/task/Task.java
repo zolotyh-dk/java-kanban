@@ -1,6 +1,7 @@
 package ru.yandex.javacourse.zolotyh.schedule.task;
 
 import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
+import ru.yandex.javacourse.zolotyh.schedule.enums.TaskType;
 
 import java.util.Objects;
 
@@ -65,11 +66,7 @@ public class Task {
 
     @Override
     public String toString() {
-        return "Task{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", status=" + status +
-                '}';
+        final String format = "%d,%s,%s,%s,%s";
+        return String.format(format, getId(), TaskType.TASK, getName(), getStatus(), getDescription());
     }
 }
