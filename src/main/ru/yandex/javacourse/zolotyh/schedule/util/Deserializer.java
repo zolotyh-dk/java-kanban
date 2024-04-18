@@ -2,9 +2,16 @@ package ru.yandex.javacourse.zolotyh.schedule.util;
 
 import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
 import ru.yandex.javacourse.zolotyh.schedule.enums.TaskType;
+import ru.yandex.javacourse.zolotyh.schedule.exception.ManagerSaveException;
+import ru.yandex.javacourse.zolotyh.schedule.manager.FileBackedTaskManager;
 import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
 import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 
 public class Deserializer {
 
@@ -29,5 +36,30 @@ public class Deserializer {
             default:
                 throw new IllegalArgumentException("Неизвестный тип задачи");
         }
+    }
+
+    public static FileBackedTaskManager loadFromFile(File file) {
+        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
+        String content = "";
+
+        try {
+            content = Files.readString(file.toPath(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new ManagerSaveException("Ошибка при загрузке задач из файла", e);
+        }
+
+        String[] lines = content.split("\n");
+        for (int i = 1; i < lines.length; i++) {
+            Task task = fromString(lines[i]);
+            if (task instanceof Epic) {
+                fileBackedTaskManager.addNewEpic((Epic) task);
+            } else if (task instanceof Subtask) {
+                fileBackedTaskManager.addNewSubtask((Subtask) task);
+            } else {
+                fileBackedTaskManager.addNewTask(task);
+            }
+        }
+
+        return fileBackedTaskManager;
     }
 }

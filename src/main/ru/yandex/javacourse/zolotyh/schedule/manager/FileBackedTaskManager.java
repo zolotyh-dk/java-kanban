@@ -1,9 +1,11 @@
 package ru.yandex.javacourse.zolotyh.schedule.manager;
 
+import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
 import ru.yandex.javacourse.zolotyh.schedule.exception.ManagerSaveException;
 import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
 import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;
+import ru.yandex.javacourse.zolotyh.schedule.util.Deserializer;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -113,5 +115,36 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         } catch (IOException e) {
             throw new ManagerSaveException("При записи в файл возникла ошибка", e);
         }
+    }
+
+    public static void main(String[] args) {
+        File backup = new File("resources/backup.csv");
+        FileBackedTaskManager oldManager = new FileBackedTaskManager(backup);
+        // Создание задач
+        Task task1 = new Task(null, "Задача 1", "Описание задачи 1", Status.NEW);
+        Task task2 = new Task(null, "Задача 2", "Описание задачи 2", Status.IN_PROGRESS);
+
+        // Добавление задач в менеджер истории
+        oldManager.addNewTask(task1);
+        oldManager.addNewTask(task2);
+
+        // Создание эпика c тремя подзадачами
+        Epic epic = new Epic(null, "Эпик с тремя подзадачами", "Описание эпика с тремя подзадачами");
+        oldManager.addNewEpic(epic);
+        Subtask subtask1 = new Subtask(null, "Подзадача 1", "Описание подзадачи 1", Status.NEW, epic.getId());
+        Subtask subtask2 = new Subtask(null, "Подзадача 2", "Описание подзадачи 2", Status.IN_PROGRESS, epic.getId());
+        Subtask subtask3 = new Subtask(null, "Подзадача 3", "Описание подзадачи 3", Status.DONE, epic.getId());
+        oldManager.addNewSubtask(subtask1);
+        oldManager.addNewSubtask(subtask2);
+        oldManager.addNewSubtask(subtask3);
+
+        // Создание эпика без подзадач
+        Epic epicWithoutSubtasks = new Epic(null, "Эпик без подзадач", "Описание эпика без подзадач");
+        oldManager.addNewEpic(epicWithoutSubtasks);
+
+        FileBackedTaskManager newManager = Deserializer.loadFromFile(backup);
+        newManager.getAllTasks().forEach(System.out::println);
+        newManager.getAllEpics().forEach(System.out::println);
+        newManager.getAllSubtasks().forEach(System.out::println);
     }
 }
