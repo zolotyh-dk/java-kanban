@@ -5,6 +5,12 @@ import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private File backup;
@@ -89,6 +95,21 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private void save() {
-        //TODO
+        final String heading = "id,type,name,status,description,epic";
+        List<Task> all = new ArrayList<>();
+        all.addAll(getAllTasks());
+        all.addAll(getAllEpics());
+        all.addAll(getAllSubtasks());
+
+        try (FileWriter writer = new FileWriter(backup, StandardCharsets.UTF_8)) {
+            writer.write(heading + '\n');
+            for (int i = 0; i < all.size(); i++) {
+                writer.write(all.get(i).toString());
+                if (i < all.size() - 1) {
+                    writer.write(",\n");
+                }
+            }
+        } catch (IOException e) {
+        }
     }
 }
