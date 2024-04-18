@@ -1,5 +1,6 @@
 package ru.yandex.javacourse.zolotyh.schedule.manager;
 
+import ru.yandex.javacourse.zolotyh.schedule.exception.ManagerSaveException;
 import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
 import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;
@@ -110,6 +111,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
             }
         } catch (IOException e) {
+            throw new ManagerSaveException("При записи в файл возникла ошибка", e);
         }
     }
 }
