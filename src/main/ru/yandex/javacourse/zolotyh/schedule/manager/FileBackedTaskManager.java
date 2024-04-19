@@ -12,7 +12,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
@@ -117,7 +116,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         File backup = new File("resources/backup.csv");
         FileBackedTaskManager oldManager = new FileBackedTaskManager(backup);
         // Создание задач
