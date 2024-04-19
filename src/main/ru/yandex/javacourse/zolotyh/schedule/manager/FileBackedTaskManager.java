@@ -117,7 +117,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     public static void main(String[] args) throws IOException {
-        File backup = new File("resources/backup.csv");
+        File backup = new File("test_resources/backup.csv");
         FileBackedTaskManager oldManager = new FileBackedTaskManager(backup);
         // Создание задач
         Task task1 = new Task(null, "Задача 1", "Описание задачи 1", Status.NEW);

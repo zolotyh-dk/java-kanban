@@ -6,8 +6,7 @@ import java.io.File;
 
 public class Managers {
     public static TaskManager getDefault() {
-//        return new InMemoryTaskManager();
-        return new FileBackedTaskManager(new File("resources/backup.csv"));
+        return new InMemoryTaskManager();
     }
 
     public static HistoryManager getDefaultHistory() {
