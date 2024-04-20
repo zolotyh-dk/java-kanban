@@ -5,7 +5,7 @@ import ru.yandex.javacourse.zolotyh.schedule.enums.TaskType;
 
 import java.util.Objects;
 
-public class Task {
+public class Task implements Comparable<Task> {
     protected Integer id;
     protected String name;
     protected String description;
@@ -68,5 +68,10 @@ public class Task {
     public String toString() {
         final String format = "%d,%s,%s,%s,%s";
         return String.format(format, getId(), TaskType.TASK, getName(), getStatus(), getDescription());
+    }
+
+    @Override
+    public int compareTo(Task other) {
+        return id.compareTo(other.getId());
     }
 }

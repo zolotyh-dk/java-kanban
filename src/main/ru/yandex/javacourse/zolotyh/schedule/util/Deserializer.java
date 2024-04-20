@@ -20,8 +20,6 @@ public class Deserializer {
 
         for (int i = 1; i < lines.length; i++) {
             Task task = fromString(lines[i]);
-            /* Тут можно запомнить старый id и восстановить его после добавления задачи в менеджер.
-              Если нужно - добавлю. */
             if (task instanceof Epic) {
                 taskManager.addNewEpic((Epic) task);
             } else if (task instanceof Subtask) {

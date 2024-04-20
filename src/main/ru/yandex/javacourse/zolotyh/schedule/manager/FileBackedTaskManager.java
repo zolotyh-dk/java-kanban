@@ -11,11 +11,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
-    private File backup;
+    private final File backup;
 
     public FileBackedTaskManager(File backup) {
         this.backup = backup;
@@ -98,10 +97,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private void save() {
         final String heading = "id,type,name,status,description,epic";
-        List<Task> all = new ArrayList<>();
+        final List<Task> all = new ArrayList<>();
         all.addAll(getAllTasks());
         all.addAll(getAllEpics());
         all.addAll(getAllSubtasks());
+        /*Сортируем лист чтобы объекты в файле хранились в порядке возрастания id
+        * Таким образом, при восстановлении хранилища, для всех задач сгенерируются те же самые id*/
+        Collections.sort(all);
 
         try (FileWriter writer = new FileWriter(backup, StandardCharsets.UTF_8)) {
             writer.write(heading + '\n');
