@@ -1,16 +1,18 @@
 package ru.yandex.javacourse.zolotyh.schedule.manager;
 
 import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
+import ru.yandex.javacourse.zolotyh.schedule.enums.TaskType;
+import ru.yandex.javacourse.zolotyh.schedule.exception.BackupLoadException;
 import ru.yandex.javacourse.zolotyh.schedule.exception.ManagerSaveException;
 import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
 import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;
-import ru.yandex.javacourse.zolotyh.schedule.util.Deserializer;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.*;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
@@ -114,18 +116,63 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 }
             }
         } catch (IOException e) {
-            throw new ManagerSaveException("При записи в файл возникла ошибка", e);
+            throw new ManagerSaveException("Не удалось сохранить задачи в файл", e);
+        }
+    }
+
+    public static FileBackedTaskManager loadFromFile(File file) {
+        FileBackedTaskManager taskManager = new FileBackedTaskManager(file);
+        String content;
+        try {
+            content = Files.readString(file.toPath(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new BackupLoadException("Не удалось прочитать файл бэкапа", e);
+        }
+        String[] lines = content.split("\n");
+
+        for (int i = 1; i < lines.length; i++) {
+            Task task = fromString(lines[i]);
+            if (task instanceof Epic) {
+                taskManager.addNewEpic((Epic) task);
+            } else if (task instanceof Subtask) {
+                taskManager.addNewSubtask((Subtask) task);
+            } else {
+                taskManager.addNewTask(task);
+            }
+        }
+
+        return taskManager;
+    }
+
+    //Формат строки: "id,type,name,status,description,epicId"
+    private static Task fromString(String value) {
+        final String[] fields = value.split(",");
+
+        final int id = Integer.parseInt(fields[0]);
+        final TaskType type = TaskType.valueOf(fields[1]);
+        final String name = fields[2];
+        final Status status = Status.valueOf(fields[3]);
+        final String description = fields[4];
+
+        switch (type) {
+            case TASK:
+                return new Task(id, name, description, status);
+            case EPIC:
+                return new Epic(id, name, description);
+            case SUBTASK:
+                int epicId = Integer.parseInt(fields[5]);
+                return new Subtask(id, name, description, status, epicId);
+            default:
+                throw new IllegalArgumentException("Неизвестный тип задачи.");
         }
     }
 
     public static void main(String[] args) throws IOException {
-        File backup = new File("test_resources/backup.csv");
+        File backup = new File("resources/backup.csv");
         FileBackedTaskManager oldManager = new FileBackedTaskManager(backup);
         // Создание задач
         Task task1 = new Task(null, "Задача 1", "Описание задачи 1", Status.NEW);
         Task task2 = new Task(null, "Задача 2", "Описание задачи 2", Status.IN_PROGRESS);
-
-        // Добавление задач в менеджер истории
         oldManager.addNewTask(task1);
         oldManager.addNewTask(task2);
 
@@ -143,7 +190,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         Epic epicWithoutSubtasks = new Epic(null, "Эпик без подзадач", "Описание эпика без подзадач");
         oldManager.addNewEpic(epicWithoutSubtasks);
 
-        FileBackedTaskManager newManager = Deserializer.loadFromFile(backup);
+        // Создание нового менеджера из файла бэкапа
+        FileBackedTaskManager newManager = loadFromFile(backup);
         newManager.getAllTasks().forEach(System.out::println);
         newManager.getAllEpics().forEach(System.out::println);
         newManager.getAllSubtasks().forEach(System.out::println);

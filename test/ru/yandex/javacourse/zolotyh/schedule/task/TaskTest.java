@@ -9,8 +9,17 @@ class TaskTest {
 
     @Test
     public void tasksShouldBeEqualsIfIdEquals() {
-        Task task1 = new Task(1, "a", "b", Status.NEW);
-        Task task2 = new Task(1, "c", "d", Status.DONE);
+        final Task task1 = new Task(1, "a", "b", Status.NEW);
+        final Task task2 = new Task(1, "c", "d", Status.DONE);
         assertEquals(task1, task2, "Задачи с одинаковыми id не равны.");
+    }
+
+    @Test
+    public void shouldBeComparableById() {
+        final Task task1 = new Task(1, "a", "b", Status.NEW);
+        final Task task2 = new Task(2, "c", "d", Status.DONE);
+        assertTrue(task2.compareTo(task1) > 0, "Задача 2 должна быть больше, чем задача 1");
+        final Task task3 = new Task(2, "e", "f", Status.IN_PROGRESS);
+        assertEquals(0, task2.compareTo(task3), "Задачи с одинаковыми id не равны.");
     }
 }
