@@ -55,7 +55,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     @Override
     public Integer addNewSubtask(Subtask subtask) {
-        final int id =  super.addNewSubtask(subtask);
+        final int id = super.addNewSubtask(subtask);
         save();
         return id;
     }
@@ -68,7 +68,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     @Override
     public int addNewEpic(Epic epic) {
-        final int id =  super.addNewEpic(epic);
+        final int id = super.addNewEpic(epic);
         save();
         return id;
     }
@@ -104,7 +104,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         all.addAll(getAllEpics());
         all.addAll(getAllSubtasks());
         /*Сортируем лист чтобы объекты в файле хранились в порядке возрастания id
-        * Таким образом, при восстановлении хранилища, для всех задач сгенерируются те же самые id*/
+         * Таким образом, при восстановлении хранилища, для всех задач сгенерируются те же самые id*/
         Collections.sort(all);
 
         try (FileWriter writer = new FileWriter(backup, StandardCharsets.UTF_8)) {
@@ -121,17 +121,17 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     public static FileBackedTaskManager loadFromFile(File file) {
-        FileBackedTaskManager taskManager = new FileBackedTaskManager(file);
-        String content;
+        final FileBackedTaskManager taskManager = new FileBackedTaskManager(file);
+        final String content;
         try {
             content = Files.readString(file.toPath(), StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new BackupLoadException("Не удалось прочитать файл бэкапа", e);
         }
-        String[] lines = content.split("\n");
+        final String[] lines = content.split("\n");
 
         for (int i = 1; i < lines.length; i++) {
-            Task task = fromString(lines[i]);
+            final Task task = fromString(lines[i]);
             if (task instanceof Epic) {
                 taskManager.addNewEpic((Epic) task);
             } else if (task instanceof Subtask) {
