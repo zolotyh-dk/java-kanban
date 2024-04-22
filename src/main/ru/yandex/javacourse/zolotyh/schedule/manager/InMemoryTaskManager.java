@@ -1,6 +1,7 @@
 package ru.yandex.javacourse.zolotyh.schedule.manager;
 
 import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
+import ru.yandex.javacourse.zolotyh.schedule.enums.TaskType;
 import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
 import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;
@@ -12,11 +13,11 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
-    private int generatorId = 0;
+    protected int generatorId = 0;
     protected final Map<Integer, Task> tasks = new HashMap<>();
     protected final Map<Integer, Epic> epics = new HashMap<>();
     protected final Map<Integer, Subtask> subtasks = new HashMap<>();
-    private final HistoryManager historyManager = Managers.getDefaultHistory();
+    protected final HistoryManager historyManager = Managers.getDefaultHistory();
 
     @Override
     public List<Task> getHistory() {
@@ -205,6 +206,16 @@ public class InMemoryTaskManager implements TaskManager {
             result.add(subtasks.get(subtaskId));
         }
         return result;
+    }
+
+    protected void addAnyTask(Task task) {
+        if (TaskType.EPIC.equals(task.getType())) {
+            epics.put(task.getId(), (Epic) task);
+        } else if (TaskType.SUBTASK.equals(task.getType())) {
+            subtasks.put(task.getId(), (Subtask) task);
+        } else {
+            tasks.put(task.getId(), task);
+        }
     }
 
     private void updateEpicStatus(int epicId) {
