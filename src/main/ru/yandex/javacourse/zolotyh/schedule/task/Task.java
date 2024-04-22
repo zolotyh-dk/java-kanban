@@ -50,6 +50,10 @@ public class Task implements Comparable<Task> {
         this.status = status;
     }
 
+    public TaskType getType() {
+        return TaskType.TASK;
+    }
+
     @Override
     public int hashCode() {
         return id;
@@ -66,8 +70,12 @@ public class Task implements Comparable<Task> {
 
     @Override
     public String toString() {
-        final String format = "%d,%s,%s,%s,%s";
-        return String.format(format, getId(), TaskType.TASK, getName(), getStatus(), getDescription());
+        return "Task{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                ", status=" + status +
+                '}';
     }
 
     @Override
