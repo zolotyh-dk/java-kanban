@@ -7,7 +7,9 @@ import ru.yandex.javacourse.zolotyh.schedule.exception.ManagerSaveException;
 import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
 import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;
+import ru.yandex.javacourse.zolotyh.schedule.util.CSVTaskFormat;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -16,10 +18,10 @@ import java.nio.file.Files;
 import java.util.*;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
-    private final File backup;
+    private final File backupFile;
 
-    public FileBackedTaskManager(File backup) {
-        this.backup = backup;
+    public FileBackedTaskManager(File backupFile) {
+        this.backupFile = backupFile;
     }
 
     @Override
@@ -98,25 +100,31 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private void save() {
-        final String heading = "id,type,name,status,description,epic";
-        final List<Task> all = new ArrayList<>();
-        all.addAll(getAllTasks());
-        all.addAll(getAllEpics());
-        all.addAll(getAllSubtasks());
-        /*Сортируем лист чтобы объекты в файле хранились в порядке возрастания id
-         * Таким образом, при восстановлении хранилища, для всех задач сгенерируются те же самые id*/
-        Collections.sort(all);
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(backupFile))) {
+            writer.write(CSVTaskFormat.getHeader());
+            writer.newLine();
 
-        try (FileWriter writer = new FileWriter(backup, StandardCharsets.UTF_8)) {
-            writer.write(heading + '\n');
-            for (int i = 0; i < all.size(); i++) {
-                writer.write(all.get(i).toString());
-                if (i < all.size() - 1) {
-                    writer.write(",\n");
-                }
+            for (Map.Entry<Integer, Task> entry : tasks.entrySet()) {
+                final Task task = entry.getValue();
+                writer.write(CSVTaskFormat.toString(task));
+                writer.newLine();
             }
+
+            for (Map.Entry<Integer, Subtask> entry : subtasks.entrySet()) {
+                final Task task = entry.getValue();
+                writer.write(CSVTaskFormat.toString(task));
+                writer.newLine();
+            }
+
+            for (Map.Entry<Integer, Epic> entry : epics.entrySet()) {
+                final Task task = entry.getValue();
+                writer.write(CSVTaskFormat.toString(task));
+                writer.newLine();
+            }
+
+            writer.newLine();
         } catch (IOException e) {
-            throw new ManagerSaveException("Не удалось сохранить задачи в файл", e);
+            throw new ManagerSaveException("Не удалось сохранить задачи в файл: " + backupFile.getName(), e);
         }
     }
 
