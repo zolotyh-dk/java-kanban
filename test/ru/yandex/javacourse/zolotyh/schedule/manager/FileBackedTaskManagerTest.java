@@ -41,7 +41,7 @@ public class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
         // Проверяем, что количество строк в файле и строка задачи соответствуют ожидаемым.
         final String[] lines = readBackup(backup);
         assertEquals(2, lines.length, "Количество строк в файле не совпадает.");
-        assertEquals("1,TASK,Новая задача,NEW,Описание задачи", lines[1],
+        assertEquals("1,TASK,Новая задача,NEW,Описание задачи,", lines[1],
                 "Сериализованная задача в файле не совпадает.");
     }
 
@@ -52,10 +52,10 @@ public class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
         // Проверяем, что количество строк в файле и строка задачи соответствуют ожидаемым.
         final String[] lines = readBackup(backup);
         assertEquals(3, lines.length, "Количество строк в файле не совпадает.");
-        assertEquals("1,EPIC,Новый эпик,DONE,Описание эпика,", lines[1],
-                "Сериализованый эпик в файле не совпадает.");
-        assertEquals("2,SUBTASK,Новая подзадача,DONE,Описание подзадачи,1", lines[2],
+        assertEquals("2,SUBTASK,Новая подзадача,DONE,Описание подзадачи,1,", lines[1],
                 "Сериализованая подзадача в файле не совпадает.");
+        assertEquals("1,EPIC,Новый эпик,DONE,Описание эпика,", lines[2],
+                "Сериализованый эпик в файле не совпадает.");
     }
 
     //Тесты на обновление существующих объектов ⬇️
@@ -66,7 +66,7 @@ public class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
         // Проверяем, что задача успешно обновлена в файле
         final String[] lines = readBackup(backup);
         assertEquals(2, lines.length, "Количество строк в файле не совпадает.");
-        assertEquals("1,TASK,Новая задача,IN_PROGRESS,Описание новой задачи", lines[1],
+        assertEquals("1,TASK,Новая задача,IN_PROGRESS,Описание новой задачи,", lines[1],
                 "Сериализованная задача в файле не совпадает.");
     }
 
@@ -77,7 +77,7 @@ public class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
         // Проверяем, что эпик успешно обновлен в файле
         final String[] lines = readBackup(backup);
         assertEquals(2, lines.length, "Количество строк в файле не совпадает.");
-        assertEquals("1,EPIC,Новый эпик,NEW,Описание нового эпика", lines[1],
+        assertEquals("1,EPIC,Новый эпик,NEW,Описание нового эпика,", lines[1],
                 "Сериализованный эпик в файле не совпадает.");
     }
 
@@ -88,10 +88,10 @@ public class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
         // Проверяем, что подзадача успешно обновлена в файле и статус эпика изменен
         final String[] lines = readBackup(backup);
         assertEquals(3, lines.length, "Количество строк в файле не совпадает.");
-        assertEquals("1,EPIC,Новый эпик,IN_PROGRESS,Описание нового эпика,", lines[1],
-                "Сериализованный эпик в файле не совпадает.");
-        assertEquals("2,SUBTASK,Обновленная подзадача,IN_PROGRESS,Описание обновленной подзадачи,1", lines[2],
+        assertEquals("2,SUBTASK,Обновленная подзадача,IN_PROGRESS,Описание обновленной подзадачи,1,", lines[1],
                 "Сериализованная подзадача в файле не совпадает.");
+        assertEquals("1,EPIC,Новый эпик,IN_PROGRESS,Описание нового эпика,", lines[2],
+                "Сериализованный эпик в файле не совпадает.");
     }
 
     //Тесты на удаление объектов ⬇️
@@ -126,7 +126,7 @@ public class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
         assertEquals(2, lines.length, "Количество строк в файле не совпадает.");
         assertEquals("id,type,name,status,description,epic", lines[0],
                 "Строка заголовоков не совпадает.");
-        assertEquals("1,EPIC,Новый эпик,NEW,Описание эпика", lines[1],
+        assertEquals("1,EPIC,Новый эпик,NEW,Описание эпика,", lines[1],
                 "Сериализованый эпик 1 в файле не совпадает.");
     }
 
@@ -150,7 +150,7 @@ public class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
         assertEquals(3, lines.length, "Количество строк в файле не совпадает.");
         assertEquals("1,EPIC,Эпик 1,NEW,Описание эпика 1,", lines[1],
                 "Сериализованый эпик 1 в файле не совпадает.");
-        assertEquals("2,EPIC,Эпик 2,NEW,Описание эпика 2", lines[2],
+        assertEquals("2,EPIC,Эпик 2,NEW,Описание эпика 2,", lines[2],
                 "Сериализованый эпик 2 в файле не совпадает.");
     }
 
@@ -183,7 +183,7 @@ public class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
     @Test
     public void shouldLoadTaskFromFile() {
         // Записываем в файл задачу
-        final String serializedTask = "id,type,name,status,description,epic\n" +
+        final String serializedTask = "id,type,name,status,description,epic" + System.lineSeparator() +
                 "1,TASK,Новая задача,NEW,Описание задачи";
         try (FileWriter writer = new FileWriter(backup.toFile(), StandardCharsets.UTF_8)) {
             writer.write(serializedTask);
@@ -202,10 +202,9 @@ public class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
     @Test
     public void shouldLoadEpicWithSubtaskFromFile() {
         // Записываем в файл эпик и его подзадачу
-        final String serializedTask = """
-                id,type,name,status,description,epic
-                1,EPIC,Эпик с подзадачей,IN_PROGRESS,Описание эпика,
-                2,SUBTASK,Подзадача,IN_PROGRESS,Описание подзадачи,1""";
+        final String serializedTask = "id,type,name,status,description,epic" + System.lineSeparator() +
+                                      "1,EPIC,Эпик с подзадачей,IN_PROGRESS,Описание эпика," + System.lineSeparator() +
+                                      "2,SUBTASK,Подзадача,IN_PROGRESS,Описание подзадачи,1";
         try (FileWriter writer = new FileWriter(backup.toFile(), StandardCharsets.UTF_8)) {
             writer.write(serializedTask);
         } catch (IOException e) {
@@ -229,15 +228,14 @@ public class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
     @Test
     public void shouldLoadAllTasksFromFile() {
         // Записываем в файл несколько задач разных типов
-        final String serializedTasks = """
-                id,type,name,status,description,epic
-                1,TASK,Задача 1,NEW,Описание задачи 1,
-                2,TASK,Задача 2,IN_PROGRESS,Описание задачи 2,
-                3,EPIC,Эпик с тремя подзадачами,IN_PROGRESS,Описание эпика с тремя подзадачами,
-                4,SUBTASK,Подзадача 1,NEW,Описание подзадачи 1,3,
-                5,SUBTASK,Подзадача 2,IN_PROGRESS,Описание подзадачи 2,3,
-                6,SUBTASK,Подзадача 3,DONE,Описание подзадачи 3,3,
-                7,EPIC,Эпик без подзадач,NEW,Описание эпика без подзадач""";
+        final String serializedTasks = "id,type,name,status,description,epic" + System.lineSeparator() +
+                                       "1,TASK,Задача 1,NEW,Описание задачи 1," + System.lineSeparator() +
+                                       "2,TASK,Задача 2,IN_PROGRESS,Описание задачи 2," + System.lineSeparator() +
+                                       "3,EPIC,Эпик с тремя подзадачами,IN_PROGRESS,Описание эпика с тремя подзадачами," + System.lineSeparator() +
+                                       "4,SUBTASK,Подзадача 1,NEW,Описание подзадачи 1,3," + System.lineSeparator() +
+                                       "5,SUBTASK,Подзадача 2,IN_PROGRESS,Описание подзадачи 2,3," + System.lineSeparator() +
+                                       "6,SUBTASK,Подзадача 3,DONE,Описание подзадачи 3,3," + System.lineSeparator() +
+                                       "7,EPIC,Эпик без подзадач,NEW,Описание эпика без подзадач";
         try (FileWriter writer = new FileWriter(backup.toFile(), StandardCharsets.UTF_8)) {
             writer.write(serializedTasks);
         } catch (IOException e) {
@@ -275,6 +273,6 @@ public class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
         } catch (IOException e) {
             throw new BackupLoadException("Не удалось прочитать файл бэкапа", e);
         }
-        return content.split("\n");
+        return content.split(System.lineSeparator());
     }
 }

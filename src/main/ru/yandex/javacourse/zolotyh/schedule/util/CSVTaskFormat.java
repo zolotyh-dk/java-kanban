@@ -15,7 +15,7 @@ public class CSVTaskFormat {
     public static String toString(Task task) {
         return task.getId() + "," + task.getType() + "," + task.getName() + "," +
                 task.getStatus() + "," + task.getDescription() + "," +
-                (task.getType().equals(TaskType.SUBTASK) ? ((Subtask) task).getEpicId() : "");
+                (task.getType().equals(TaskType.SUBTASK) ? ((Subtask) task).getEpicId() + "," : "");
     }
 
     //Формат строки: "id,type,name,status,description,epicId"
@@ -32,7 +32,9 @@ public class CSVTaskFormat {
             case TASK:
                 return new Task(id, name, description, status);
             case EPIC:
-                return new Epic(id, name, description);
+                Epic epic = new Epic(id, name, description);
+                epic.setStatus(status);
+                return epic;
             case SUBTASK:
                 int epicId = Integer.parseInt(fields[5]);
                 return new Subtask(id, name, description, status, epicId);
