@@ -1,5 +1,7 @@
 package ru.yandex.javacourse.zolotyh.schedule.task;
 
+import ru.yandex.javacourse.zolotyh.schedule.enums.TaskType;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,8 +20,17 @@ public class Epic extends Task {
         this.subtaskIds = subtaskIds;
     }
 
+    @Override
+    public TaskType getType() {
+        return TaskType.EPIC;
+    }
+
     public void clearSubtaskIds() {
         subtaskIds.clear();
+    }
+
+    public void addSubtaskId(int id) {
+        subtaskIds.add(id);
     }
 
     public void removeSubtask(int id) {

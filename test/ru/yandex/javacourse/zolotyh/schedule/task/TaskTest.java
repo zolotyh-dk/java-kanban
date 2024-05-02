@@ -9,8 +9,8 @@ class TaskTest {
 
     @Test
     public void tasksShouldBeEqualsIfIdEquals() {
-        Task task1 = new Task(1, "a", "b", Status.NEW);
-        Task task2 = new Task(1, "c", "d", Status.DONE);
+        final Task task1 = new Task(1, "a", "b", Status.NEW);
+        final Task task2 = new Task(1, "c", "d", Status.DONE);
         assertEquals(task1, task2, "Задачи с одинаковыми id не равны.");
     }
 }

@@ -13,7 +13,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryTaskManagerTest {
-    private static TaskManager taskManager;
+    protected TaskManager taskManager;
 
     @BeforeEach
     public void beforeEach() {
@@ -24,7 +24,7 @@ class InMemoryTaskManagerTest {
     @Test
     public void addNewTask() {
         // Создаем новую задачу
-        final Task task = new Task(null, "Новая задача из теста addNewTask", "Описание задачи", Status.NEW);
+        final Task task = new Task(null, "Новая задача", "Описание задачи", Status.NEW);
         final int id = taskManager.addNewTask(task);
 
         // Получаем сохраненную задачу и проверяем ее соответствие
@@ -45,12 +45,11 @@ class InMemoryTaskManagerTest {
     @Test
     public void addNewEpicWithSubtask() {
         // Создаем новый эпик
-        final Epic epic = new Epic(null, "Test addNewEpicWithSubtask epic",
-                "Test addNewEpicSubtask epic description");
+        final Epic epic = new Epic(null, "Новый эпик", "Описание эпика");
         final int epicId = taskManager.addNewEpic(epic);
 
         // Создаем новую подзадачу и добавляем ее к эпику
-        final Subtask subtask = new Subtask(null, "Test addNewSubtask", "Test addNewSubtask description",
+        final Subtask subtask = new Subtask(null, "Новая подзадача", "Описание подзадачи",
                 Status.DONE, epicId);
         final int subtaskId = taskManager.addNewSubtask(subtask);
 
@@ -78,13 +77,11 @@ class InMemoryTaskManagerTest {
     @Test
     public void updateTask() {
         // Создаем и сохраняем старую задачу
-        final Task old = new Task(null, "Старая задача из теста updateTask", "Описание старой задачи",
-                Status.NEW);
+        final Task old = new Task(null, "Старая задача", "Описание старой задачи", Status.NEW);
         final int id = taskManager.addNewTask(old);
 
         // Создаем и сохраняем обновленную задачу
-        final Task updated = new Task(id, "Новая задача из теста updateTask", "Описание новой задачи",
-                Status.IN_PROGRESS);
+        final Task updated = new Task(id, "Новая задача", "Описание новой задачи", Status.IN_PROGRESS);
         taskManager.updateTask(updated);
 
         // Проверяем, что задача успешно обновлена
@@ -94,11 +91,11 @@ class InMemoryTaskManagerTest {
     @Test
     public void updateEpic() {
         // Создаем и сохраняем старый эпик
-        final Epic old = new Epic(null, "Старый эпик из теста updateEpic", "Описание старого эпика");
+        final Epic old = new Epic(null, "Старый эпик", "Описание старого эпика");
         final int id = taskManager.addNewEpic(old);
 
         // Создаем и сохраняем обновленный эпик
-        Epic updated = new Epic(id, "Новый эпик из теста updateEpic", "Описание нового эпика");
+        final Epic updated = new Epic(id, "Новый эпик", "Описание нового эпика");
         taskManager.updateEpic(updated);
 
         // Проверяем, что эпик успешно обновлен
@@ -108,16 +105,16 @@ class InMemoryTaskManagerTest {
     @Test
     public void updateSubtask() {
         // Создаем эпик и сохраняем его
-        final Epic epic = new Epic(null, "Новый эпик из теста updateSubtask", "Описание нового эпика");
+        final Epic epic = new Epic(null, "Новый эпик", "Описание нового эпика");
         final int epicId = taskManager.addNewEpic(epic);
 
         // Создаем и сохраняем старую подзадачу, привязанную к эпику
-        final Subtask old = new Subtask(null, "Старая подзадача из теста updateSubtask",
-                "Описание старой подзадачи", Status.NEW, epicId);
+        final Subtask old = new Subtask(null, "Старая подзадача", "Описание старой подзадачи",
+                Status.NEW, epicId);
         final int subtaskId = taskManager.addNewSubtask(old);
 
         // Создаем и сохраняем обновленную подзадачу, привязанную к эпику
-        final Subtask updated = new Subtask(subtaskId, "Обновленная подзадача из теста updateSubtask",
+        final Subtask updated = new Subtask(subtaskId, "Обновленная подзадача",
                 "Описание обновленной подзадачи", Status.IN_PROGRESS, epicId);
         taskManager.updateSubtask(updated);
 
@@ -130,7 +127,7 @@ class InMemoryTaskManagerTest {
     @Test
     public void deleteTask() {
         // Создаем и сохраняем задачу
-        final Task task = new Task(null, "Задача из теста deleteTask", "Описание задчи", Status.NEW);
+        final Task task = new Task(null, "Новая задача", "Описание задчи", Status.NEW);
         final int id = taskManager.addNewTask(task);
 
         // Удаляем задачу
@@ -144,9 +141,9 @@ class InMemoryTaskManagerTest {
     @Test
     public void deleteEpic() {
         // Создаем новый эпик и связанную с ним подзадачу
-        final Epic epic = new Epic(null, "Новый эпик из теста deleteEpic", "Описание эпика");
+        final Epic epic = new Epic(null, "Новый эпик", "Описание эпика");
         final int epicId = taskManager.addNewEpic(epic);
-        final Subtask subtask = new Subtask(null, "Подзадача из теста deleteEpic",
+        final Subtask subtask = new Subtask(null, "Новая подзадача",
                 "Описание подзадачи", Status.NEW, epicId);
         final int subtaskId = taskManager.addNewSubtask(subtask);
 
@@ -163,10 +160,10 @@ class InMemoryTaskManagerTest {
     @Test
     public void deleteSubtask() {
         // Создаем новый эпик и связанную с ним подзадачу
-        final Epic epic = new Epic(null, "Новый эпик из теста deleteSubtask", "Описание эпика");
+        final Epic epic = new Epic(null, "Новый эпик", "Описание эпика");
         final int epicId = taskManager.addNewEpic(epic);
-        final Subtask subtask = new Subtask(null, "Подзадача из теста deleteSubtask",
-                "Описание подзадачи", Status.DONE, epicId);
+        final Subtask subtask = new Subtask(null, "Новая подзадача", "Описание подзадачи",
+                Status.DONE, epicId);
         final int subtaskId = taskManager.addNewSubtask(subtask);
 
         // Удаляем подзадачу
@@ -182,8 +179,8 @@ class InMemoryTaskManagerTest {
     @Test
     public void deleteAllTasks() {
         // Создаем и сохраняем несколько задач
-        final Task task1 = new Task(null, "Задача 1 из теста deleteTask", "Описание задчи 1", Status.NEW);
-        final Task task2 = new Task(null, "Задача 2 из теста deleteTask", "Описание задчи 2", Status.IN_PROGRESS);
+        final Task task1 = new Task(null, "Задача 1", "Описание задчи 1", Status.NEW);
+        final Task task2 = new Task(null, "Задача 2", "Описание задчи 2", Status.IN_PROGRESS);
         final int task1Id = taskManager.addNewTask(task1);
         final int task2Id = taskManager.addNewTask(task2);
 
@@ -199,14 +196,14 @@ class InMemoryTaskManagerTest {
     @Test
     public void deleteAllSubtasks() {
         // Создаем и сохраняем несколько эпиков и подзадач
-        final Epic epic1 = new Epic(null, "Эпик 1 из теста deleteAllSubtasks", "Описание эпика 1");
-        final Epic epic2 = new Epic(null, "Эпик 2 из теста deleteAllSubtasks", "Описание эпика 2");
+        final Epic epic1 = new Epic(null, "Эпик 1", "Описание эпика 1");
+        final Epic epic2 = new Epic(null, "Эпик 2", "Описание эпика 2");
         final int epic1Id = taskManager.addNewEpic(epic1);
         final int epic2Id = taskManager.addNewEpic(epic2);
-        final Subtask subtask1 = new Subtask(null, "Подзадача эпика 1 из теста deleteAllSubtasks",
-                "Описание подзадачи эпика 1", Status.DONE, epic1Id);
-        final Subtask subtask2 = new Subtask(null, "Подзадача эпика 2 из теста deleteAllSubtasks",
-                "Описание подзадачи эпика 2", Status.NEW, epic2Id);
+        final Subtask subtask1 = new Subtask(null, "Подзадача эпика 1", "Описание подзадачи эпика 1",
+                Status.DONE, epic1Id);
+        final Subtask subtask2 = new Subtask(null, "Подзадача эпика 2", "Описание подзадачи эпика 2",
+                Status.NEW, epic2Id);
         final int subtask1Id = taskManager.addNewSubtask(subtask1);
         final int subtask2Id = taskManager.addNewSubtask(subtask2);
 
@@ -224,14 +221,14 @@ class InMemoryTaskManagerTest {
     @Test
     public void deleteAllEpics() {
         // Создаем и сохраняем несколько эпиков и связанные с ними подзадачи
-        final Epic epic1 = new Epic(null, "Эпик 1 из теста deleteAllEpics", "Описание эпика 1");
-        final Epic epic2 = new Epic(null, "Эпик 2 из теста deleteAllEpics", "Описание эпика 2");
+        final Epic epic1 = new Epic(null, "Эпик 1", "Описание эпика 1");
+        final Epic epic2 = new Epic(null, "Эпик 2", "Описание эпика 2");
         final int epic1Id = taskManager.addNewEpic(epic1);
         final int epic2Id = taskManager.addNewEpic(epic2);
-        final Subtask subtask1 = new Subtask(null, "Подзадача эпика 1 из теста deleteAllEpics",
-                "Описание подзадачи эпика 1", Status.DONE, epic1Id);
-        final Subtask subtask2 = new Subtask(null, "Подзадача эпика 2 из теста deleteAllEpics",
-                "Описание подзадачи эпика 2", Status.NEW, epic2Id);
+        final Subtask subtask1 = new Subtask(null, "Подзадача эпика 1", "Описание подзадачи эпика 1",
+                Status.DONE, epic1Id);
+        final Subtask subtask2 = new Subtask(null, "Подзадача эпика 2", "Описание подзадачи эпика 2",
+                Status.NEW, epic2Id);
         final int subtask1Id = taskManager.addNewSubtask(subtask1);
         final int subtask2Id = taskManager.addNewSubtask(subtask2);
 

@@ -1,6 +1,7 @@
 package ru.yandex.javacourse.zolotyh.schedule.task;
 
 import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
+import ru.yandex.javacourse.zolotyh.schedule.enums.TaskType;
 
 import java.util.Objects;
 
@@ -47,6 +48,10 @@ public class Task {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public TaskType getType() {
+        return TaskType.TASK;
     }
 
     @Override
