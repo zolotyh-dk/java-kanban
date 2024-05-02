@@ -2,14 +2,25 @@ package ru.yandex.javacourse.zolotyh.schedule.task;
 
 import ru.yandex.javacourse.zolotyh.schedule.enums.TaskType;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
+    private LocalDateTime endTime;
     private List<Integer> subtaskIds = new ArrayList<>();
 
     public Epic(Integer id, String name, String description) {
         super(id, name, description, null);
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
     public List<Integer> getSubtaskIds() {
@@ -43,8 +54,10 @@ public class Epic extends Task {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", status=" + status + '\'' +
-                ", subtasksSize=" + subtaskIds.size() +
+                ", status=" + status +
+                ", subtaskIdsSize=" + subtaskIds.size() +
+                ", duration=" + duration +
+                ", startTime=" + startTime +
                 '}';
     }
 }

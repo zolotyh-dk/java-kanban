@@ -7,10 +7,9 @@ import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;
 import ru.yandex.javacourse.zolotyh.schedule.util.Managers;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class InMemoryTaskManager implements TaskManager {
     protected int generatorId = 0;
@@ -64,7 +63,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteAllSubtasks() {
         for (Epic epic : epics.values()) {
             epic.clearSubtaskIds();
-            updateEpicStatus(epic.getId());
+            updateEpicFields(epic.getId());
         }
 
         for (Integer id : subtasks.keySet()) {
@@ -129,7 +128,7 @@ public class InMemoryTaskManager implements TaskManager {
         subtask.setId(id);
         subtasks.put(id, subtask);
         epic.getSubtaskIds().add(id);
-        updateEpicStatus(epicId);
+        updateEpicFields(epicId);
         return subtask.getId();
     }
 
@@ -146,7 +145,7 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
         subtasks.put(id, subtask);
-        updateEpicStatus(epicId);
+        updateEpicFields(epicId);
     }
 
     @Override
@@ -154,7 +153,7 @@ public class InMemoryTaskManager implements TaskManager {
         final int id = ++generatorId;
         epic.setId(id);
         epics.put(id, epic);
-        updateEpicStatus(id);
+        updateEpicFields(id);
         return id;
     }
 
@@ -196,7 +195,7 @@ public class InMemoryTaskManager implements TaskManager {
         }
         final Epic epic = epics.get(subtask.getEpicId());
         epic.removeSubtask(id);
-        updateEpicStatus(epic.getId());
+        updateEpicFields(epic.getId());
     }
 
     @Override
@@ -218,26 +217,53 @@ public class InMemoryTaskManager implements TaskManager {
         }
     }
 
-    private void updateEpicStatus(int epicId) {
+    private void updateEpicFields(int epicId) {
         final Epic epic = epics.get(epicId);
         final List<Integer> subs = epic.getSubtaskIds();
-        if (subs.isEmpty()) {
-            epic.setStatus(Status.NEW);
-            return;
-        }
-        Status status = null;
-        for (int id : subs) {
-            final Subtask subtask = subtasks.get(id);
-            if (status == null) {
-                status = subtask.getStatus();
-                continue;
-            }
-            if (status.equals(subtask.getStatus()) && !status.equals(Status.IN_PROGRESS)) {
-                continue;
-            }
-            epic.setStatus(Status.IN_PROGRESS);
-            return;
-        }
+
+        final Status status = calculateEpicStatusFromSubtasks(subs);
+        final Duration duration = calculateDurationsSum(subs);
+        final LocalDateTime startTime = findEarliestStartTime(subs);
+        final LocalDateTime endTime = findLatestEndTime(subs);
+
         epic.setStatus(status);
+        epic.setStartTime(startTime);
+        epic.setDuration(duration);
+        epic.setEndTime(endTime);
+    }
+
+    private Status calculateEpicStatusFromSubtasks(List<Integer> subtaskIds) {
+        return subtaskIds.stream()
+                .map(subtasks::get)
+                .map(Task::getStatus)
+                .reduce((status1, status2) ->
+                        status1.equals(status2) && !status1.equals(Status.IN_PROGRESS) ? status1 : Status.IN_PROGRESS)
+                .orElse(Status.NEW);
+    }
+
+    private Duration calculateDurationsSum(List<Integer> subtaskIds) {
+        return subtaskIds.stream()
+                .map(subtasks::get)
+                .map(Task::getDuration)
+                .filter(Objects::nonNull)
+                .reduce(Duration.ZERO, Duration::plus);
+    }
+
+    private LocalDateTime findEarliestStartTime(List<Integer> subtaskIds) {
+        return subtaskIds.stream()
+                .map(subtasks::get)
+                .map(Task::getStartTime)
+                .filter(Objects::nonNull)
+                .min(LocalDateTime::compareTo)
+                .orElse(null);
+    }
+
+    private LocalDateTime findLatestEndTime(List<Integer> subtaskIds) {
+        return subtaskIds.stream()
+                .map(subtasks::get)
+                .map(Task::getEndTime)
+                .filter(Objects::nonNull)
+                .max(LocalDateTime::compareTo)
+                .orElse(null);
     }
 }

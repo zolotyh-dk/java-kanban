@@ -3,11 +3,19 @@ package ru.yandex.javacourse.zolotyh.schedule.task;
 import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
 import ru.yandex.javacourse.zolotyh.schedule.enums.TaskType;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class Subtask extends Task {
     private Integer epicId;
 
     public Subtask(Integer id, String name, String description, Status status, int epicId) {
         super(id, name, description, status);
+        this.epicId = epicId;
+    }
+
+    public Subtask(Integer id, String name, String description, Status status, Duration duration, LocalDateTime startTime, int epicId) {
+        super(id, name, description, status, duration, startTime);
         this.epicId = epicId;
     }
 
@@ -27,11 +35,13 @@ public class Subtask extends Task {
     @Override
     public String toString() {
         return "Subtask{" +
-                "id=" + id +
+                "epicId=" + epicId +
+                ", id=" + id +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", status=" + status + '\'' +
-                ", epicId=" + epicId +
+                ", status=" + status +
+                ", duration=" + duration +
+                ", startTime=" + startTime +
                 '}';
     }
 }
