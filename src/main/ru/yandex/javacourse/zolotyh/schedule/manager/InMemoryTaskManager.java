@@ -246,7 +246,8 @@ public class InMemoryTaskManager implements TaskManager {
                 .map(subtasks::get)
                 .map(Task::getDuration)
                 .filter(Objects::nonNull)
-                .reduce(Duration.ZERO, Duration::plus);
+                .reduce(Duration::plus)
+                .orElse(null);
     }
 
     private LocalDateTime findEarliestStartTime(List<Integer> subtaskIds) {
