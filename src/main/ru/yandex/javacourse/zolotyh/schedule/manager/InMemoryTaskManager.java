@@ -1,11 +1,12 @@
 package ru.yandex.javacourse.zolotyh.schedule.manager;
 
 import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
-import ru.yandex.javacourse.zolotyh.schedule.enums.TaskType;
+import ru.yandex.javacourse.zolotyh.schedule.exception.InvalidTaskException;
 import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
 import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;
 import ru.yandex.javacourse.zolotyh.schedule.util.Managers;
+import ru.yandex.javacourse.zolotyh.schedule.util.TimeUtil;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -17,9 +18,7 @@ public class InMemoryTaskManager implements TaskManager {
     protected final Map<Integer, Epic> epics = new HashMap<>();
     protected final Map<Integer, Subtask> subtasks = new HashMap<>();
     protected final HistoryManager historyManager = Managers.getDefaultHistory();
-
-    protected final Set<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime)
-            .thenComparing(Task::getId));
+    protected final Set<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime));
 
     @Override
     public List<Task> getHistory() {
@@ -60,7 +59,6 @@ public class InMemoryTaskManager implements TaskManager {
 
         for (Integer epicId : epics.keySet()) {
             historyManager.remove(epicId);
-            prioritizedTasks.remove(epics.get(epicId));
         }
         epics.clear();
     }
@@ -108,6 +106,10 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int addNewTask(Task task) {
+        if (TimeUtil.isTimeIntersections(task, getPrioritizedTasks())) {
+            // По рекомендациям из книги "Чистый код" Р.Мартин (глава 7), решил выбрасывать исключение, а не возвращать -1
+            throw new InvalidTaskException("Время выполнения новой задачи уже занято другой задачей.");
+        }
         final int id = ++generatorId;
         task.setId(id);
         tasks.put(id, task);
@@ -117,6 +119,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateTask(Task task) {
+        if (TimeUtil.isTimeIntersections(task, getPrioritizedTasks())) {
+            throw new InvalidTaskException("Время выполнения обновленной задачи уже занято другой задачей.");
+        }
         final int id = task.getId();
         final Task savedTask = tasks.get(id);
         if (savedTask == null) {
@@ -128,6 +133,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Integer addNewSubtask(Subtask subtask) {
+        if (TimeUtil.isTimeIntersections(subtask, getPrioritizedTasks())) {
+            throw new InvalidTaskException("Время выполнения новой подзадачи уже занято другой задачей.");
+        }
         final int epicId = subtask.getEpicId();
         final Epic epic = epics.get(epicId);
         if (epic == null) {
@@ -144,6 +152,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateSubtask(Subtask subtask) {
+        if (TimeUtil.isTimeIntersections(subtask, getPrioritizedTasks())) {
+            throw new InvalidTaskException("Время выполнения обновленной подзадачи уже занято другой задачей.");
+        }
         final int id = subtask.getId();
         final int epicId = subtask.getEpicId();
         final Subtask savedSubtask = subtasks.get(id);
@@ -165,7 +176,6 @@ public class InMemoryTaskManager implements TaskManager {
         epic.setId(id);
         epics.put(id, epic);
         updateEpicFields(id);
-        addPrioritizedTask(epic);
         return id;
     }
 
@@ -179,7 +189,6 @@ public class InMemoryTaskManager implements TaskManager {
         epic.setSubtaskIds(savedEpic.getSubtaskIds());
         epic.setStatus(savedEpic.getStatus());
         epics.put(id, epic);
-        addPrioritizedTask(epic);
     }
 
     @Override
@@ -198,7 +207,6 @@ public class InMemoryTaskManager implements TaskManager {
             prioritizedTasks.remove(subtask);
         }
         epics.remove(id);
-        prioritizedTasks.remove(epic);
         historyManager.remove(id);
     }
 
@@ -238,14 +246,19 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     protected void addAnyTask(Task task) {
-        if (TaskType.EPIC.equals(task.getType())) {
-            epics.put(task.getId(), (Epic) task);
-        } else if (TaskType.SUBTASK.equals(task.getType())) {
-            subtasks.put(task.getId(), (Subtask) task);
-        } else {
-            tasks.put(task.getId(), task);
+        switch (task.getType()) {
+            case EPIC:
+                epics.put(task.getId(), (Epic) task);
+                break;
+            case SUBTASK:
+                subtasks.put(task.getId(), (Subtask) task);
+                addPrioritizedTask(task);
+                break;
+            default:
+                tasks.put(task.getId(), task);
+                addPrioritizedTask(task);
+                break;
         }
-        addPrioritizedTask(task);
     }
 
     private void updateEpicFields(int epicId) {
