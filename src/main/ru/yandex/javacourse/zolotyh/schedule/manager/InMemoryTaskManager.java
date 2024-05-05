@@ -11,6 +11,7 @@ import ru.yandex.javacourse.zolotyh.schedule.util.TimeUtil;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
     protected int generatorId = 0;
@@ -42,38 +43,37 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void deleteAllTasks() {
-        for (Integer id : tasks.keySet()) {
-            historyManager.remove(id);
-            prioritizedTasks.remove(tasks.get(id));
-        }
+        tasks.keySet().stream()
+                .peek(historyManager::remove)
+                .map(tasks::get)
+                .forEach(prioritizedTasks::remove);
         tasks.clear();
     }
 
     @Override
     public void deleteAllEpics() {
-        for (Integer subtaskId : subtasks.keySet()) {
-            historyManager.remove(subtaskId);
-            prioritizedTasks.remove(subtasks.get(subtaskId));
-        }
+        subtasks.keySet().stream()
+                .peek(historyManager::remove)
+                .map(subtasks::get)
+                .forEach(prioritizedTasks::remove);
         subtasks.clear();
 
-        for (Integer epicId : epics.keySet()) {
-            historyManager.remove(epicId);
-        }
+        epics.keySet().forEach(historyManager::remove);
         epics.clear();
     }
 
     @Override
     public void deleteAllSubtasks() {
-        for (Epic epic : epics.values()) {
-            epic.clearSubtaskIds();
-            updateEpicFields(epic.getId());
-        }
+        epics.values().stream()
+                .peek(Epic::clearSubtaskIds)
+                .map(Epic::getId)
+                .forEach(this::updateEpicFields);
 
-        for (Integer id : subtasks.keySet()) {
-            historyManager.remove(id);
-            prioritizedTasks.remove(subtasks.get(id));
-        }
+        subtasks.keySet().stream()
+                .peek(historyManager::remove)
+                .map(subtasks::get)
+                .forEach(prioritizedTasks::remove);
+
         subtasks.clear();
     }
 
@@ -201,13 +201,14 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteEpic(int id) {
         final Epic epic = epics.get(id);
-        for (Integer subtaskId : epic.getSubtaskIds()) {
-            final Subtask subtask = subtasks.remove(subtaskId);
-            historyManager.remove(subtaskId);
-            prioritizedTasks.remove(subtask);
-        }
-        epics.remove(id);
         historyManager.remove(id);
+
+        epic.getSubtaskIds().stream()
+                .peek(historyManager::remove)
+                .map(subtasks::remove)
+                .forEach(prioritizedTasks::remove);
+
+        epics.remove(id);
     }
 
     @Override
@@ -225,11 +226,9 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public List<Subtask> getSubtasksByEpic(Epic epic) {
-        final List<Subtask> result = new ArrayList<>();
-        for (Integer subtaskId : epic.getSubtaskIds()) {
-            result.add(subtasks.get(subtaskId));
-        }
-        return result;
+        return epic.getSubtaskIds().stream()
+                .map(subtasks::get)
+                .collect(Collectors.toList());
     }
 
     @Override
