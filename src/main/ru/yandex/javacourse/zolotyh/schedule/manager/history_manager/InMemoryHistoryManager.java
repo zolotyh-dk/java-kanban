@@ -1,4 +1,4 @@
-package ru.yandex.javacourse.zolotyh.schedule.manager;
+package ru.yandex.javacourse.zolotyh.schedule.manager.history_manager;
 
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;
 

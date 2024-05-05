@@ -1,4 +1,4 @@
-package ru.yandex.javacourse.zolotyh.schedule.manager;
+package ru.yandex.javacourse.zolotyh.schedule.manager.task_manager;
 
 import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
 import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
@@ -27,15 +27,15 @@ public interface TaskManager {
 
     int addNewTask(Task task);
 
-    void updateTask(Task task);
+    int addNewEpic(Epic epic);
 
     Integer addNewSubtask(Subtask subtask);
 
-    void updateSubtask(Subtask subtask);
-
-    int addNewEpic(Epic epic);
+    void updateTask(Task task);
 
     void updateEpic(Epic epic);
+
+    void updateSubtask(Subtask subtask);
 
     void deleteTask(int id);
 

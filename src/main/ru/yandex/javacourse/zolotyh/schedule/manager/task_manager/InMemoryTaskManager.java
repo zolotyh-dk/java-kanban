@@ -1,7 +1,8 @@
-package ru.yandex.javacourse.zolotyh.schedule.manager;
+package ru.yandex.javacourse.zolotyh.schedule.manager.task_manager;
 
 import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
 import ru.yandex.javacourse.zolotyh.schedule.exception.InvalidTaskException;
+import ru.yandex.javacourse.zolotyh.schedule.manager.history_manager.HistoryManager;
 import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
 import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;
@@ -240,7 +241,6 @@ public class InMemoryTaskManager implements TaskManager {
         if (task == null || task.getStartTime() == null) {
             return;
         }
-        prioritizedTasks.removeIf(prioritizedTasks::contains);
         prioritizedTasks.add(task);
     }
 

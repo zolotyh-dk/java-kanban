@@ -6,6 +6,9 @@ import java.util.List;
 
 public class TimeUtil {
     public static boolean isTimeIntersections(Task newTask, List<Task> existedTasks) {
+        if (newTask.getStartTime() == null || newTask.getEndTime() == null) {
+            return false;
+        }
         return existedTasks.stream().anyMatch(existedTask -> TimeUtil.isTimeIntersection(newTask, existedTask));
     }
 
