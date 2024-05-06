@@ -1,22 +1,28 @@
 package ru.yandex.javacourse.zolotyh.schedule.manager.task_manager;
 
+import org.junit.jupiter.api.BeforeEach;
+
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class FileBackedTaskManagerTest extends InMemoryTaskManagerTest {
     private Path backup;
 
-//    @Override
-//    @BeforeEach
-//    public void beforeEach() {
-//        try {
-//            backup = Files.createTempFile(Paths.get("test_resources"), "backup_test", ".csv");
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-//        backup.toFile().deleteOnExit();
-//        taskManager = new FileBackedTaskManager(backup.toFile());
-//    }
-//
+    @Override
+    @BeforeEach
+    public void beforeEach() {
+        try {
+            backup = Files.createTempFile(Paths.get("test_resources"), "backup_test", ".csv");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        backup.toFile().deleteOnExit();
+        taskManager = new FileBackedTaskManager(backup.toFile());
+        super.beforeEach();
+    }
+
 //    //Тесты на добавление новых объектов ⬇️
 //    @Override
 //    @Test

@@ -8,6 +8,7 @@ import ru.yandex.javacourse.zolotyh.schedule.task.Task;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.Month;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TaskUtil {
@@ -36,7 +37,7 @@ public class TaskUtil {
                 new Subtask(7, "Подзадача 2", "Описание подзадачи 2", Status.DONE,
                         Duration.ofMinutes(120), LocalDateTime.of(2024, Month.MAY, 1, 10, 0), 4),
                 new Subtask(8, "Подзадача 3", "Описание подзадачи 3", Status.DONE,
-                        Duration.ofMinutes(15), LocalDateTime.of(2024, Month.MAY, 3, 16, 0), 4)
+                        Duration.ofMinutes(30), LocalDateTime.of(2024, Month.MAY, 3, 16, 0), 4)
         );
     }
 
@@ -52,5 +53,51 @@ public class TaskUtil {
     public static Subtask getNewSubtask() {
         return new Subtask(null, "Новая подзадача", "Описание подзадачи", Status.DONE,
                 Duration.ofMinutes(15), LocalDateTime.of(2024, Month.JUNE, 1, 9, 0), 4);
+    }
+
+    public static List<Task> getTasksWithTimeIntersection() {
+        return List.of(
+                // 03.05 16:00 - 16:30             [------Подзадача 3------]
+                // 03.05 15:30 - 16:15  [------Эта задача------]
+                new Task(null, "Задача, пересекающаяся по времени с подзадачей 3", "Описание", Status.NEW,
+                        Duration.ofMinutes(45), LocalDateTime.of(2024, Month.MAY, 3, 15, 30)),
+
+                // 01.05 08:00 - 08:30  [------Задача 1------]
+                // 01.05 08:15 - 09:00             [------Эта задача------]
+                new Task(null, "Задача, пересекающаяся по времени с задачей 1", "Описание", Status.NEW,
+                        Duration.ofMinutes(45), LocalDateTime.of(2024, Month.MAY, 1, 8, 15)),
+
+                // 01.05 12:15 - 13:00  [------Задача 2------]
+                // 01.05 12:15 - 13:00  [------Эта задача----]
+                new Task(null, "Задача, полностью совпадающая по времени с задачей 2", "Описание", Status.NEW,
+                        Duration.ofMinutes(45), LocalDateTime.of(2024, Month.MAY, 1, 12, 15)),
+
+                // 01.05 12:15 - 13:00  [------Задача 2------]
+                // 01.05 12:30 - 12:45     [--Эта задача--]
+                new Task(null, "Задача, внутри интервала задачи 2", "Описание", Status.NEW,
+                        Duration.ofMinutes(15), LocalDateTime.of(2024, Month.MAY, 1, 12, 30)),
+
+                // 02.05 11:00 - 12:30      [--Подзадача 1--]
+                // 02.05 10:00 - 14:00  [------Эта задача-------]
+                new Task(null, "Задача, полностью перекрывающая подзадачу 1", "Описание", Status.NEW,
+                        Duration.ofMinutes(240), LocalDateTime.of(2024, Month.MAY, 2, 10, 0))
+        );
+    }
+
+    public static List<Subtask> generateSubtasksWithStatus(int newNumber, int inProgressNumber, int doneNumber, int epicId) {
+        List<Subtask> subtasks = new ArrayList<>();
+        for (int i = 0; i < newNumber; i++) {
+            subtasks.add(new Subtask(null, "Подзадача со статусом NEW №" + (i + 1), "Описание",
+                    Status.NEW, epicId));
+        }
+        for (int i = 0; i < inProgressNumber; i++) {
+            subtasks.add(new Subtask(null, "Подзадача со статусом IN_PROGRESS №" + (i + 1), "Описание",
+                    Status.IN_PROGRESS, epicId));
+        }
+        for (int i = 0; i < doneNumber; i++) {
+            subtasks.add(new Subtask(null, "Подзадача со статусом DONE №" + (i + 1), "Описание",
+                    Status.DONE, epicId));
+        }
+        return subtasks;
     }
 }

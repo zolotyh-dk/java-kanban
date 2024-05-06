@@ -108,7 +108,6 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public int addNewTask(Task task) {
         if (TimeUtil.isTimeIntersections(task, getPrioritizedTasks())) {
-            // По рекомендациям из книги "Чистый код" Р.Мартин (глава 7), решил выбрасывать исключение, а не возвращать -1
             throw new InvalidTaskException("Время выполнения новой задачи уже занято другой задачей.");
         }
         final int id = ++generatorId;

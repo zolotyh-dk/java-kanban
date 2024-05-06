@@ -3,6 +3,7 @@ package ru.yandex.javacourse.zolotyh.schedule.manager.task_manager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
+import ru.yandex.javacourse.zolotyh.schedule.exception.InvalidTaskException;
 import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
 import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;
@@ -264,5 +265,46 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         for (int i = 0; i < actual.size(); i++) {
             assertEquals(expected.get(i), actual.get(i), "Задача с индексом " + i + " не совпадает.");
         }
+    }
+
+    @Test
+    public void shouldThrowsWhenTaskTimeIntersected() {
+        getTasksWithTimeIntersection()
+                .forEach(task -> assertThrows(InvalidTaskException.class, () -> taskManager.addNewTask(task),
+                        "Пересечение новой задачи по времени с существующей задачей не вызвало выброс исключения."));
+    }
+
+    @Test
+    public void epicStatusShouldBeNewWhenAllSubtasksNew() {
+        final List<Subtask> subtasks = generateSubtasksWithStatus(3, 0, 0, 5);
+        subtasks.forEach(taskManager::addNewSubtask);
+        final Epic epic = taskManager.getEpicById(5);
+        assertEquals(Status.NEW, epic.getStatus(), "Статус эпика должен быть NEW если все подзадачи NEW.");
+    }
+
+    @Test
+    public void epicStatusShouldBeDoneWhenAllSubtasksDone() {
+        final List<Subtask> subtasks = generateSubtasksWithStatus(0, 0, 3, 5);
+        subtasks.forEach(taskManager::addNewSubtask);
+        final Epic epic = taskManager.getEpicById(5);
+        assertEquals(Status.DONE, epic.getStatus(), "Статус эпика должен быть DONE если все подзадачи DONE.");
+    }
+
+    @Test
+    public void epicStatusShouldBeInProgressWhenSubtasksNewAndDone() {
+        final List<Subtask> subtasks = generateSubtasksWithStatus(1, 0, 1, 5);
+        subtasks.forEach(taskManager::addNewSubtask);
+        final Epic epic = taskManager.getEpicById(5);
+        assertEquals(Status.IN_PROGRESS, epic.getStatus(), "Статус эпика должен быть IN_PROGRESS," +
+                " если подзадачи NEW и DONE.");
+    }
+
+    @Test
+    public void epicStatusShouldBeInProgressWhenSubtasksInProgress() {
+        final List<Subtask> subtasks = generateSubtasksWithStatus(0, 3, 0, 5);
+        subtasks.forEach(taskManager::addNewSubtask);
+        final Epic epic = taskManager.getEpicById(5);
+        assertEquals(Status.IN_PROGRESS, epic.getStatus(), "Статус эпика должен быть IN_PROGRESS," +
+                " если все подзадачи IN_PROGRESS.");
     }
 }
