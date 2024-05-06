@@ -68,7 +68,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void deleteAllTasks() {
+    public void deleteAllTasksTest() {
         taskManager.deleteAllTasks();
         assertNull(taskManager.getTaskById(testTasks.get(0).getId()), "Задача 1 не удалилась.");
         assertNull(taskManager.getTaskById(testTasks.get(1).getId()), "Задача 2 не удалилась.");
@@ -77,7 +77,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void deleteAllSubtasks() {
+    public void deleteAllSubtasksTest() {
         taskManager.deleteAllSubtasks();
         assertNull(taskManager.getSubtaskById(testSubtasks.get(0).getId()), "Подзадача 1 не удалилась.");
         assertNull(taskManager.getSubtaskById(testSubtasks.get(1).getId()), "Подзадача 2 не удалилась.");
@@ -88,7 +88,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    public void deleteAllEpics() {
+    public void deleteAllEpicsTest() {
         taskManager.deleteAllEpics();
         assertNull(taskManager.getEpicById(testEpics.get(0).getId()), "Эпик с тремя подзадачами не удалилился.");
         assertNull(taskManager.getEpicById(testEpics.get(1).getId()), "Эпик без подзадач не удалилился.");
