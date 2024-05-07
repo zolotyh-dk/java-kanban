@@ -5,7 +5,6 @@ import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface TaskManager {
     List<Task> getAllTasks();
@@ -20,11 +19,11 @@ public interface TaskManager {
 
     void deleteAllSubtasks();
 
-    Optional<Task> getTaskById(int id);
+    Task getTaskById(int id);
 
-    Optional<Epic> getEpicById(int id);
+    Epic getEpicById(int id);
 
-    Optional<Subtask> getSubtaskById(int id);
+    Subtask getSubtaskById(int id);
 
     int addNewTask(Task task);
 

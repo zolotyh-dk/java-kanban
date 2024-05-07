@@ -83,24 +83,24 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Optional<Task> getTaskById(int id) {
+    public Task getTaskById(int id) {
         final Optional<Task> task = Optional.ofNullable(tasks.get(id));
         task.ifPresent(historyManager::add);
-        return task;
+        return task.orElseThrow(() -> new NoSuchElementException("Задачи с id " + id + " не существует."));
     }
 
     @Override
-    public Optional<Epic> getEpicById(int id) {
+    public Epic getEpicById(int id) {
         final Optional<Epic> epic = Optional.ofNullable(epics.get(id));
         epic.ifPresent(historyManager::add);
-        return epic;
+        return epic.orElseThrow(() -> new NoSuchElementException("Эпика с id " + id + " не существует."));
     }
 
     @Override
-    public Optional<Subtask> getSubtaskById(int id) {
+    public Subtask getSubtaskById(int id) {
         final Optional<Subtask> subtask = Optional.ofNullable(subtasks.get(id));
         subtask.ifPresent(historyManager::add);
-        return subtask;
+        return subtask.orElseThrow(() -> new NoSuchElementException("Подзадачи с id " + id + " не существует."));
     }
 
     @Override

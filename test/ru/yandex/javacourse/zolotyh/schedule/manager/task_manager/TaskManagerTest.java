@@ -9,10 +9,7 @@ import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;
 import ru.yandex.javacourse.zolotyh.schedule.util.TaskUtil;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static ru.yandex.javacourse.zolotyh.schedule.util.TaskUtil.*;
@@ -71,18 +68,18 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     public void deleteAllTasksTest() {
         taskManager.deleteAllTasks();
-        assertEquals(Optional.empty(), taskManager.getTaskById(testTasks.get(0).getId()), "Задача 1 не удалилась.");
-        assertEquals(Optional.empty(), taskManager.getTaskById(testTasks.get(1).getId()), "Задача 2 не удалилась.");
-        assertEquals(Optional.empty(), taskManager.getTaskById(testTasks.get(2).getId()), "Задача 3 не удалилась.");
+        assertThrows(NoSuchElementException.class, () -> taskManager.getTaskById(testTasks.get(0).getId()), "Задача 1 не удалилась.");
+        assertThrows(NoSuchElementException.class, () -> taskManager.getTaskById(testTasks.get(1).getId()), "Задача 2 не удалилась.");
+        assertThrows(NoSuchElementException.class, () -> taskManager.getTaskById(testTasks.get(2).getId()), "Задача 3 не удалилась.");
         assertEquals(0, taskManager.getAllTasks().size(), "Список задач не пустой.");
     }
 
     @Test
     public void deleteAllSubtasksTest() {
         taskManager.deleteAllSubtasks();
-        assertEquals(Optional.empty(), taskManager.getSubtaskById(testSubtasks.get(0).getId()), "Подзадача 1 не удалилась.");
-        assertEquals(Optional.empty(), taskManager.getSubtaskById(testSubtasks.get(1).getId()), "Подзадача 2 не удалилась.");
-        assertEquals(Optional.empty(), taskManager.getSubtaskById(testSubtasks.get(2).getId()), "Подзадача 3 не удалилась.");
+        assertThrows(NoSuchElementException.class, () -> taskManager.getSubtaskById(testSubtasks.get(0).getId()), "Подзадача 1 не удалилась.");
+        assertThrows(NoSuchElementException.class, () -> taskManager.getSubtaskById(testSubtasks.get(1).getId()), "Подзадача 2 не удалилась.");
+        assertThrows(NoSuchElementException.class, () -> taskManager.getSubtaskById(testSubtasks.get(2).getId()), "Подзадача 3 не удалилась.");
         assertEquals(0, testEpics.get(0).getSubtaskIds().size(), "Список id подзадач эпика с тремя подзадачами не пустой.");
         assertEquals(0, testEpics.get(1).getSubtaskIds().size(), "Список id подзадач эпика без подзадач не пустой.");
         assertEquals(0, taskManager.getAllSubtasks().size(), "Список всех подзадач не пустой.");
@@ -91,11 +88,11 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     public void deleteAllEpicsTest() {
         taskManager.deleteAllEpics();
-        assertEquals(Optional.empty(), taskManager.getEpicById(testEpics.get(0).getId()), "Эпик с тремя подзадачами не удалилился.");
-        assertEquals(Optional.empty(), taskManager.getEpicById(testEpics.get(1).getId()), "Эпик без подзадач не удалилился.");
-        assertEquals(Optional.empty(), taskManager.getSubtaskById(testSubtasks.get(0).getId()), "Подзадача 1 не удалилась.");
-        assertEquals(Optional.empty(), taskManager.getSubtaskById(testSubtasks.get(1).getId()), "Подзадача 2 не удалилась.");
-        assertEquals(Optional.empty(), taskManager.getSubtaskById(testSubtasks.get(2).getId()), "Подзадача 3 не удалилась.");
+        assertThrows(NoSuchElementException.class, () -> taskManager.getEpicById(testEpics.get(0).getId()), "Эпик с тремя подзадачами не удалилился.");
+        assertThrows(NoSuchElementException.class, () -> taskManager.getEpicById(testEpics.get(1).getId()), "Эпик без подзадач не удалилился.");
+        assertThrows(NoSuchElementException.class, () -> taskManager.getSubtaskById(testSubtasks.get(0).getId()), "Подзадача 1 не удалилась.");
+        assertThrows(NoSuchElementException.class, () -> taskManager.getSubtaskById(testSubtasks.get(1).getId()), "Подзадача 2 не удалилась.");
+        assertThrows(NoSuchElementException.class, () -> taskManager.getSubtaskById(testSubtasks.get(2).getId()), "Подзадача 3 не удалилась.");
         assertEquals(0, taskManager.getAllSubtasks().size(), "Список всех подзадач не пустой.");
         assertEquals(0, taskManager.getAllEpics().size(), "Список всех эпиков не пустой.");
     }
@@ -103,7 +100,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     public void getTaskByIdTest() {
         final Task expected = testTasks.get(0);
-        final Task actual = taskManager.getTaskById(expected.getId()).get();
+        final Task actual = taskManager.getTaskById(expected.getId());
         assertEquals(expected, actual, "Задачи не совпадают.");
         assertEquals(expected.getName(), actual.getName(), "Имена задач не совпадают.");
         assertEquals(expected.getDescription(), actual.getDescription(), "Описания подзадач не совпадают.");
@@ -115,7 +112,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     public void getEpicByIdTest() {
         final Epic expected = testEpics.get(0);
-        final Epic actual = taskManager.getEpicById(expected.getId()).get();
+        final Epic actual = taskManager.getEpicById(expected.getId());
         assertEquals(expected, actual, "Эпики не совпадают.");
         assertEquals(expected.getName(), actual.getName(), "Иена эпиков не совпадают.");
         assertEquals(expected.getDescription(), actual.getDescription(), "Описания эпиков не совпадают.");
@@ -124,7 +121,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     public void getSubtaskById() {
         final Subtask expected = testSubtasks.get(0);
-        final Subtask actual = taskManager.getSubtaskById(expected.getId()).get();
+        final Subtask actual = taskManager.getSubtaskById(expected.getId());
         assertEquals(expected, actual, "Подзадачи не совпадают.");
         assertEquals(expected.getName(), actual.getName(), "Имена подзадач не совпадают.");
         assertEquals(expected.getDescription(), actual.getDescription(), "Описания подзадач не совпадают.");
@@ -137,7 +134,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     public void addNewTaskTest() {
         final Task task = getNewTask();
         final int id = taskManager.addNewTask(task);
-        final Task savedTask = taskManager.getTaskById(id).get();
+        final Task savedTask = taskManager.getTaskById(id);
         assertNotNull(savedTask, "Задача не найдена.");
         assertEquals(task, savedTask, "Задачи не совпадают.");
         assertEquals(task.getName(), savedTask.getName(), "Имя задачи не совпадает.");
@@ -151,7 +148,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     public void addNewEpicTest() {
         final Epic epic = getNewEpic();
         final int epicId = taskManager.addNewEpic(epic);
-        final Epic savedEpic = taskManager.getEpicById(epicId).get();
+        final Epic savedEpic = taskManager.getEpicById(epicId);
         assertNotNull(savedEpic, "Эпик не найден.");
         assertEquals(epic, savedEpic, "Эпики не совпадают.");
         assertEquals(epic.getName(), savedEpic.getName(), "Имя эпика не совпадает.");
@@ -163,7 +160,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     public void addNewSubtaskTest() {
         final Subtask subtask = getNewSubtask();
         final int id = taskManager.addNewSubtask(subtask);
-        final Subtask savedSubtask = taskManager.getSubtaskById(id).get();
+        final Subtask savedSubtask = taskManager.getSubtaskById(id);
         assertNotNull(savedSubtask, "Подзадача не найдена.");
         assertEquals(subtask, savedSubtask, "Подзадачи не совпадают.");
         assertEquals(subtask.getName(), savedSubtask.getName(), "Имя подзадачи не совпадает.");
@@ -180,7 +177,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         final int id = testTasks.get(0).getId();
         updated.setId(id);
         taskManager.updateTask(updated);
-        final Task saved = taskManager.getTaskById(id).get();
+        final Task saved = taskManager.getTaskById(id);
         assertEquals(updated, saved, "Задача не обновляется.");
         assertEquals(updated.getName(), saved.getName(), "Имя задачи не обновилось.");
         assertEquals(updated.getDescription(), saved.getDescription(), "Описание задачи не обновилось.");
@@ -195,7 +192,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         final int id = testEpics.get(0).getId();
         updated.setId(id);
         taskManager.updateEpic(updated);
-        final Epic saved = taskManager.getEpicById(id).get();
+        final Epic saved = taskManager.getEpicById(id);
         assertEquals(updated, saved, "Эпик не обновляется.");
         assertEquals(updated.getName(), saved.getName(), "Имя эпика не обновилось.");
         assertEquals(updated.getDescription(), saved.getDescription(), "Описание эпика не обновилось.");
@@ -207,14 +204,14 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         final int id = testSubtasks.get(0).getId();
         updated.setId(id);
         taskManager.updateSubtask(updated);
-        final Subtask saved = taskManager.getSubtaskById(id).get();
+        final Subtask saved = taskManager.getSubtaskById(id);
         assertEquals(updated, saved, "Подзадача не обновляется.");
         assertEquals(updated.getName(), saved.getName(), "Имя подзадачи не обновилось.");
         assertEquals(updated.getDescription(), saved.getDescription(), "Описание подзадачи не обновилось.");
         assertEquals(updated.getStatus(), saved.getStatus(), "Статус подзадачи не обновился.");
         assertEquals(updated.getDuration(), saved.getDuration(), "Продолжительность подзадачи не обновилась.");
         assertEquals(updated.getStartTime(), saved.getStartTime(), "Время начала подзадачи не обновилось.");
-        assertEquals(Status.DONE, taskManager.getEpicById(saved.getEpicId()).get().getStatus(),
+        assertEquals(Status.DONE, taskManager.getEpicById(saved.getEpicId()).getStatus(),
                 "Статус эпика не обновился вместе с подзадачей.");
     }
 
@@ -222,7 +219,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     public void deleteTaskTest() {
         final int id = testTasks.get(0).getId();
         taskManager.deleteTask(id);
-        assertEquals(Optional.empty(), taskManager.getTaskById(id), "Задача не удаляется.");
+        assertThrows(NoSuchElementException.class, () -> taskManager.getTaskById(id), "Задача не удаляется.");
         assertEquals(2, taskManager.getAllTasks().size(), "Размер списка оставшихся зада не соответствует.");
     }
 
@@ -230,7 +227,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     public void deleteEpicTest() {
         final int id = testEpics.get(0).getId();
         taskManager.deleteEpic(id);
-        assertEquals(Optional.empty(), taskManager.getEpicById(id), "Эпик не удаляется.");
+        assertThrows(NoSuchElementException.class, () -> taskManager.getEpicById(id), "Эпик не удаляется.");
         assertEquals(1, taskManager.getAllEpics().size(), "Размер списка эпиков не соответствует.");
         assertEquals(0, taskManager.getAllSubtasks().size(), "Размер списка подзадач не соответвствует.");
     }
@@ -238,9 +235,9 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     @Test
     public void deleteSubtaskTest() {
         final Subtask subtask = testSubtasks.get(0);
-        final Epic epic = taskManager.getEpicById(subtask.getEpicId()).get();
+        final Epic epic = taskManager.getEpicById(subtask.getEpicId());
         taskManager.deleteSubtask(subtask.getId());
-        assertEquals(Optional.empty(), taskManager.getSubtaskById(subtask.getId()), "Подзадача не удаляется.");
+        assertThrows(NoSuchElementException.class, () -> taskManager.getSubtaskById(subtask.getId()), "Подзадача не удаляется.");
         assertEquals(2, taskManager.getAllSubtasks().size(), "Размер списка подзадач соответствует.");
         assertEquals(2, epic.getSubtaskIds().size(), "Размер списка id подзадач у эпика не соответствует.");
         assertEquals(Status.DONE, epic.getStatus(), "Статус эпика не стал DONE после удаления подзадачи.");
@@ -248,7 +245,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
 
     @Test
     public void getSubtasksByEpicTest() {
-        final Epic savedEpic = taskManager.getEpicById(testEpics.get(0).getId()).get();
+        final Epic savedEpic = taskManager.getEpicById(testEpics.get(0).getId());
         final List<Subtask> subtasksByEpic = taskManager.getSubtasksByEpic(savedEpic);
         assertEquals(testSubtasks.size(), subtasksByEpic.size(), "Размер списка подзадач не совпадает.");
         for (int i = 0; i < subtasksByEpic.size(); i++) {
@@ -279,7 +276,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     public void epicStatusShouldBeNewWhenAllSubtasksNew() {
         final List<Subtask> subtasks = generateSubtasksWithStatus(3, 0, 0, 5);
         subtasks.forEach(taskManager::addNewSubtask);
-        final Epic epic = taskManager.getEpicById(5).get();
+        final Epic epic = taskManager.getEpicById(5);
         assertEquals(Status.NEW, epic.getStatus(), "Статус эпика должен быть NEW если все подзадачи NEW.");
     }
 
@@ -287,7 +284,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     public void epicStatusShouldBeDoneWhenAllSubtasksDone() {
         final List<Subtask> subtasks = generateSubtasksWithStatus(0, 0, 3, 5);
         subtasks.forEach(taskManager::addNewSubtask);
-        final Epic epic = taskManager.getEpicById(5).get();
+        final Epic epic = taskManager.getEpicById(5);
         assertEquals(Status.DONE, epic.getStatus(), "Статус эпика должен быть DONE если все подзадачи DONE.");
     }
 
@@ -295,7 +292,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     public void epicStatusShouldBeInProgressWhenSubtasksNewAndDone() {
         final List<Subtask> subtasks = generateSubtasksWithStatus(1, 0, 1, 5);
         subtasks.forEach(taskManager::addNewSubtask);
-        final Epic epic = taskManager.getEpicById(5).get();
+        final Epic epic = taskManager.getEpicById(5);
         assertEquals(Status.IN_PROGRESS, epic.getStatus(), "Статус эпика должен быть IN_PROGRESS," +
                 " если подзадачи NEW и DONE.");
     }
@@ -304,7 +301,7 @@ public abstract class TaskManagerTest<T extends TaskManager> {
     public void epicStatusShouldBeInProgressWhenSubtasksInProgress() {
         final List<Subtask> subtasks = generateSubtasksWithStatus(0, 3, 0, 5);
         subtasks.forEach(taskManager::addNewSubtask);
-        final Epic epic = taskManager.getEpicById(5).get();
+        final Epic epic = taskManager.getEpicById(5);
         assertEquals(Status.IN_PROGRESS, epic.getStatus(), "Статус эпика должен быть IN_PROGRESS," +
                 " если все подзадачи IN_PROGRESS.");
     }
