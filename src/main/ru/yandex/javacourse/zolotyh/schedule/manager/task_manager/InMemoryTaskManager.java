@@ -21,6 +21,7 @@ public class InMemoryTaskManager implements TaskManager {
     protected final Map<Integer, Subtask> subtasks = new HashMap<>();
     protected final HistoryManager historyManager = Managers.getDefaultHistory();
     protected final Set<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime));
+    protected final TimeUtil.TimeSlotTable timeSlotTable = new TimeUtil.TimeSlotTable();
 
     @Override
     public List<Task> getHistory() {
@@ -47,6 +48,7 @@ public class InMemoryTaskManager implements TaskManager {
         tasks.keySet().stream()
                 .peek(historyManager::remove)
                 .map(tasks::get)
+                .peek(task -> timeSlotTable.freeTimeInterval(task.getStartTime(), task.getEndTime()))
                 .forEach(prioritizedTasks::remove);
         tasks.clear();
     }
@@ -56,6 +58,7 @@ public class InMemoryTaskManager implements TaskManager {
         subtasks.keySet().stream()
                 .peek(historyManager::remove)
                 .map(subtasks::get)
+                .peek(subtask -> timeSlotTable.freeTimeInterval(subtask.getStartTime(), subtask.getEndTime()))
                 .forEach(prioritizedTasks::remove);
         subtasks.clear();
 
@@ -73,6 +76,7 @@ public class InMemoryTaskManager implements TaskManager {
         subtasks.keySet().stream()
                 .peek(historyManager::remove)
                 .map(subtasks::get)
+                .peek(subtask -> timeSlotTable.freeTimeInterval(subtask.getStartTime(), subtask.getEndTime()))
                 .forEach(prioritizedTasks::remove);
 
         subtasks.clear();
@@ -101,7 +105,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int addNewTask(Task task) {
-        if (TimeUtil.isTimeIntersections(task, getPrioritizedTasks())) {
+        if (TimeUtil.isTimeIntersection(task, timeSlotTable)) {
             throw new InvalidTaskException("Время выполнения новой задачи уже занято другой задачей.");
         }
         final int id = ++generatorId;
@@ -113,7 +117,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateTask(Task task) {
-        if (TimeUtil.isTimeIntersections(task, getPrioritizedTasks())) {
+        if (TimeUtil.isTimeIntersection(task, getPrioritizedTasks())) {
             throw new InvalidTaskException("Время выполнения обновленной задачи уже занято другой задачей.");
         }
         final int id = task.getId();
@@ -127,7 +131,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Integer addNewSubtask(Subtask subtask) {
-        if (TimeUtil.isTimeIntersections(subtask, getPrioritizedTasks())) {
+        if (TimeUtil.isTimeIntersection(subtask, timeSlotTable)) {
             throw new InvalidTaskException("Время выполнения новой подзадачи уже занято другой задачей.");
         }
         final int epicId = subtask.getEpicId();
@@ -146,7 +150,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateSubtask(Subtask subtask) {
-        if (TimeUtil.isTimeIntersections(subtask, getPrioritizedTasks())) {
+        if (TimeUtil.isTimeIntersection(subtask, timeSlotTable)) {
             throw new InvalidTaskException("Время выполнения обновленной подзадачи уже занято другой задачей.");
         }
         final int id = subtask.getId();
@@ -190,6 +194,7 @@ public class InMemoryTaskManager implements TaskManager {
         final Task task = tasks.remove(id);
         historyManager.remove(id);
         prioritizedTasks.remove(task);
+        timeSlotTable.freeTimeInterval(task.getStartTime(), task.getEndTime());
     }
 
     @Override
@@ -200,6 +205,7 @@ public class InMemoryTaskManager implements TaskManager {
         epic.getSubtaskIds().stream()
                 .peek(historyManager::remove)
                 .map(subtasks::remove)
+                .peek(subtask -> timeSlotTable.freeTimeInterval(subtask.getStartTime(), subtask.getEndTime()))
                 .forEach(prioritizedTasks::remove);
 
         epics.remove(id);
@@ -208,11 +214,12 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void deleteSubtask(int id) {
         final Subtask subtask = subtasks.remove(id);
-        prioritizedTasks.remove(subtask);
-        historyManager.remove(id);
         if (subtask == null) {
             return;
         }
+        prioritizedTasks.remove(subtask);
+        timeSlotTable.freeTimeInterval(subtask.getStartTime(), subtask.getEndTime());
+        historyManager.remove(id);
         final Epic epic = epics.get(subtask.getEpicId());
         epic.removeSubtask(id);
         updateEpicFields(epic.getId());
@@ -235,6 +242,7 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
         prioritizedTasks.add(task);
+        timeSlotTable.bookTimeInterval(task.getStartTime(), task.getEndTime());
     }
 
     protected void addAnyTask(Task task) {
