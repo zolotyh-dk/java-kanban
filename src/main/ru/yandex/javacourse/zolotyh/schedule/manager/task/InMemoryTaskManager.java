@@ -7,10 +7,10 @@ import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
 import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;
 import ru.yandex.javacourse.zolotyh.schedule.util.Managers;
-import ru.yandex.javacourse.zolotyh.schedule.util.TimeUtil;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -21,7 +21,18 @@ public class InMemoryTaskManager implements TaskManager {
     protected final Map<Integer, Subtask> subtasks = new HashMap<>();
     protected final HistoryManager historyManager = Managers.getDefaultHistory();
     protected final Set<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime));
-    protected final TimeUtil.TimeSlotTable timeSlotTable = new TimeUtil.TimeSlotTable();
+    protected final Map<LocalDateTime, Boolean> slots;
+
+    public InMemoryTaskManager() {
+        // Создание таблицы свободных слотов времени на год вперед
+        slots = new HashMap<>();
+        LocalDateTime current = LocalDateTime.of(2024, Month.MAY, 1, 0, 0);
+        final LocalDateTime endOfYear = current.plusYears(1);
+        while (current.isBefore(endOfYear)) {
+            slots.put(current, false); // Изначально все временные слоты свободны
+            current = current.plusMinutes(15);
+        }
+    }
 
     @Override
     public List<Task> getHistory() {
@@ -48,7 +59,7 @@ public class InMemoryTaskManager implements TaskManager {
         tasks.keySet().stream()
                 .peek(historyManager::remove)
                 .map(tasks::get)
-                .peek(task -> timeSlotTable.freeTimeInterval(task.getStartTime(), task.getEndTime()))
+                .peek(task -> freeTimeInterval(task.getStartTime(), task.getEndTime()))
                 .forEach(prioritizedTasks::remove);
         tasks.clear();
     }
@@ -58,7 +69,7 @@ public class InMemoryTaskManager implements TaskManager {
         subtasks.keySet().stream()
                 .peek(historyManager::remove)
                 .map(subtasks::get)
-                .peek(subtask -> timeSlotTable.freeTimeInterval(subtask.getStartTime(), subtask.getEndTime()))
+                .peek(subtask -> freeTimeInterval(subtask.getStartTime(), subtask.getEndTime()))
                 .forEach(prioritizedTasks::remove);
         subtasks.clear();
 
@@ -76,7 +87,7 @@ public class InMemoryTaskManager implements TaskManager {
         subtasks.keySet().stream()
                 .peek(historyManager::remove)
                 .map(subtasks::get)
-                .peek(subtask -> timeSlotTable.freeTimeInterval(subtask.getStartTime(), subtask.getEndTime()))
+                .peek(subtask -> freeTimeInterval(subtask.getStartTime(), subtask.getEndTime()))
                 .forEach(prioritizedTasks::remove);
 
         subtasks.clear();
@@ -105,7 +116,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int addNewTask(Task task) {
-        if (TimeUtil.isTimeIntersection(task, timeSlotTable)) {
+        if (isTimeIntervalBusy(task.getStartTime(), task.getEndTime())) {
             throw new InvalidTaskException("Время выполнения новой задачи уже занято другой задачей.");
         }
         final int id = ++generatorId;
@@ -117,7 +128,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateTask(Task task) {
-        if (TimeUtil.isTimeIntersection(task, getPrioritizedTasks())) {
+        if (isTimeIntervalBusy(task.getStartTime(), task.getEndTime())) {
             throw new InvalidTaskException("Время выполнения обновленной задачи уже занято другой задачей.");
         }
         final int id = task.getId();
@@ -131,7 +142,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Integer addNewSubtask(Subtask subtask) {
-        if (TimeUtil.isTimeIntersection(subtask, timeSlotTable)) {
+        if (isTimeIntervalBusy(subtask.getStartTime(), subtask.getEndTime())) {
             throw new InvalidTaskException("Время выполнения новой подзадачи уже занято другой задачей.");
         }
         final int epicId = subtask.getEpicId();
@@ -150,7 +161,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateSubtask(Subtask subtask) {
-        if (TimeUtil.isTimeIntersection(subtask, timeSlotTable)) {
+        if (isTimeIntervalBusy(subtask.getStartTime(), subtask.getEndTime())) {
             throw new InvalidTaskException("Время выполнения обновленной подзадачи уже занято другой задачей.");
         }
         final int id = subtask.getId();
@@ -194,7 +205,7 @@ public class InMemoryTaskManager implements TaskManager {
         final Task task = tasks.remove(id);
         historyManager.remove(id);
         prioritizedTasks.remove(task);
-        timeSlotTable.freeTimeInterval(task.getStartTime(), task.getEndTime());
+        freeTimeInterval(task.getStartTime(), task.getEndTime());
     }
 
     @Override
@@ -205,7 +216,7 @@ public class InMemoryTaskManager implements TaskManager {
         epic.getSubtaskIds().stream()
                 .peek(historyManager::remove)
                 .map(subtasks::remove)
-                .peek(subtask -> timeSlotTable.freeTimeInterval(subtask.getStartTime(), subtask.getEndTime()))
+                .peek(subtask -> freeTimeInterval(subtask.getStartTime(), subtask.getEndTime()))
                 .forEach(prioritizedTasks::remove);
 
         epics.remove(id);
@@ -218,7 +229,7 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
         prioritizedTasks.remove(subtask);
-        timeSlotTable.freeTimeInterval(subtask.getStartTime(), subtask.getEndTime());
+        freeTimeInterval(subtask.getStartTime(), subtask.getEndTime());
         historyManager.remove(id);
         final Epic epic = epics.get(subtask.getEpicId());
         epic.removeSubtask(id);
@@ -242,7 +253,7 @@ public class InMemoryTaskManager implements TaskManager {
             return;
         }
         prioritizedTasks.add(task);
-        timeSlotTable.bookTimeInterval(task.getStartTime(), task.getEndTime());
+        bookTimeInterval(task.getStartTime(), task.getEndTime());
     }
 
     protected void addAnyTask(Task task) {
@@ -310,5 +321,52 @@ public class InMemoryTaskManager implements TaskManager {
                 .filter(Objects::nonNull)
                 .max(LocalDateTime::compareTo)
                 .orElse(null);
+    }
+
+    // Проверка методом наложения отрезков
+    private boolean isTimeIntersection(Task newTask, List<Task> existedTasks) {
+        if (newTask.getStartTime() == null || newTask.getEndTime() == null) {
+            return false;
+        }
+        return existedTasks.stream().anyMatch(existedTask -> isTimeIntersection(newTask, existedTask));
+    }
+
+    private boolean isTimeIntersection(Task newTask, Task existedTask) {
+        return newTask.getStartTime().isBefore(existedTask.getEndTime()) &&
+                newTask.getEndTime().isAfter(existedTask.getStartTime());
+    }
+
+    // Проверка через 15-минутные интервалы в HashMap slots
+    private boolean isTimeIntervalBusy(LocalDateTime start, LocalDateTime end) {
+        if (start == null || end == null) {
+            return false;
+        }
+        LocalDateTime current = start;
+        while (current.isBefore(end)) {
+            if (!slots.containsKey(current) || slots.get(current)) {
+                return true;
+            }
+            current = current.plusMinutes(15);
+        }
+        return false;
+    }
+
+    private void bookTimeInterval(LocalDateTime start, LocalDateTime end) {
+        LocalDateTime current = start;
+        while (current.isBefore(end)) {
+            slots.put(current, true);
+            current = current.plusMinutes(15);
+        }
+    }
+
+    private void freeTimeInterval(LocalDateTime start, LocalDateTime end) {
+        if (start == null || end == null) {
+            return;
+        }
+        LocalDateTime current = start;
+        while (current.isBefore(end)) {
+            slots.put(current, false);
+            current = current.plusMinutes(15);
+        }
     }
 }

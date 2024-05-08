@@ -220,7 +220,6 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         }
 
         final FileBackedTaskManager newManager = FileBackedTaskManager.loadFromFile(backup.toFile());
-        newManager.getAllTasks().forEach(System.out::println);
         assertEquals(3, newManager.getAllTasks().size(), "Количество десериализованных задач не соответствует.");
         assertEquals(2, newManager.getAllEpics().size(), "Количество десериализованных эпиков не соответствует.");
         assertEquals(3, newManager.getAllSubtasks().size(), "Количество десериализованных подзадач не соответствует.");
