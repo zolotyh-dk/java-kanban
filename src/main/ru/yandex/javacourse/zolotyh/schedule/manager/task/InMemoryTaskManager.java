@@ -1,8 +1,8 @@
-package ru.yandex.javacourse.zolotyh.schedule.manager.task_manager;
+package ru.yandex.javacourse.zolotyh.schedule.manager.task;
 
 import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
 import ru.yandex.javacourse.zolotyh.schedule.exception.InvalidTaskException;
-import ru.yandex.javacourse.zolotyh.schedule.manager.history_manager.HistoryManager;
+import ru.yandex.javacourse.zolotyh.schedule.manager.history.HistoryManager;
 import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
 import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;

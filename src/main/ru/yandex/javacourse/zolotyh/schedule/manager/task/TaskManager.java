@@ -1,4 +1,4 @@
-package ru.yandex.javacourse.zolotyh.schedule.manager.task_manager;
+package ru.yandex.javacourse.zolotyh.schedule.manager.task;
 
 import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
 import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;

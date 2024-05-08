@@ -1,9 +1,9 @@
 package ru.yandex.javacourse.zolotyh.schedule.util;
 
-import ru.yandex.javacourse.zolotyh.schedule.manager.history_manager.HistoryManager;
-import ru.yandex.javacourse.zolotyh.schedule.manager.history_manager.InMemoryHistoryManager;
-import ru.yandex.javacourse.zolotyh.schedule.manager.task_manager.FileBackedTaskManager;
-import ru.yandex.javacourse.zolotyh.schedule.manager.task_manager.TaskManager;
+import ru.yandex.javacourse.zolotyh.schedule.manager.history.HistoryManager;
+import ru.yandex.javacourse.zolotyh.schedule.manager.history.InMemoryHistoryManager;
+import ru.yandex.javacourse.zolotyh.schedule.manager.task.FileBackedTaskManager;
+import ru.yandex.javacourse.zolotyh.schedule.manager.task.TaskManager;
 
 import java.io.File;
 

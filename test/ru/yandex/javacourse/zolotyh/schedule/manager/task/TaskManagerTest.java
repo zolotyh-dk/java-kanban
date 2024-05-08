@@ -1,4 +1,4 @@
-package ru.yandex.javacourse.zolotyh.schedule.manager.task_manager;
+package ru.yandex.javacourse.zolotyh.schedule.manager.task;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

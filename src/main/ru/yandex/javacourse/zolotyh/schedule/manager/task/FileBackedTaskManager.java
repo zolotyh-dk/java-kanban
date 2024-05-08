@@ -1,4 +1,4 @@
-package ru.yandex.javacourse.zolotyh.schedule.manager.task_manager;
+package ru.yandex.javacourse.zolotyh.schedule.manager.task;
 
 import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
 import ru.yandex.javacourse.zolotyh.schedule.exception.ManagerSaveException;
