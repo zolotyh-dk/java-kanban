@@ -1,7 +1,7 @@
 package ru.yandex.javacourse.zolotyh.schedule;
 
 import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
-import ru.yandex.javacourse.zolotyh.schedule.manager.TaskManager;
+import ru.yandex.javacourse.zolotyh.schedule.manager.task.TaskManager;
 import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
 import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;

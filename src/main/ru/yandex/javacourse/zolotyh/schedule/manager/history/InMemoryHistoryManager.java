@@ -1,4 +1,4 @@
-package ru.yandex.javacourse.zolotyh.schedule.manager;
+package ru.yandex.javacourse.zolotyh.schedule.manager.history;
 
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;
 
@@ -14,6 +14,9 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void add(Task task) {
+        if (task == null) {
+            return;
+        }
         final int id = task.getId();
         remove(id);
         linkLast(task);
