@@ -12,8 +12,8 @@ import java.net.InetSocketAddress;
 public class HttpTaskServer {
     private static final int PORT = 8090; //8080 чем-то занят
     private final HttpServer httpServer;
-    private Gson gson;
-    private TaskManager taskManager;
+    private final Gson gson;
+    private final TaskManager taskManager;
 
     public HttpTaskServer() {
         taskManager = Managers.getDefault();
@@ -43,6 +43,6 @@ public class HttpTaskServer {
     public static void main(String[] args) {
         HttpTaskServer httpTaskServer = new HttpTaskServer();
         httpTaskServer.start();
-        httpTaskServer.stop();
+//        httpTaskServer.stop();
     }
 }

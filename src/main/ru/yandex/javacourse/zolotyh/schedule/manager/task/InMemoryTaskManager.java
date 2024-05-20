@@ -115,7 +115,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public int addNewTask(Task task) {
+    public int addNewTask(Task task) throws InvalidTaskException {
         if (isTimeIntervalBusy(task.getStartTime(), task.getEndTime())) {
             throw new InvalidTaskException("Время выполнения новой задачи уже занято другой задачей.");
         }
@@ -127,7 +127,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateTask(Task task) {
+    public void updateTask(Task task) throws InvalidTaskException {
         if (isTimeIntervalBusy(task.getStartTime(), task.getEndTime())) {
             throw new InvalidTaskException("Время выполнения обновленной задачи уже занято другой задачей.");
         }
@@ -141,7 +141,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Integer addNewSubtask(Subtask subtask) {
+    public Integer addNewSubtask(Subtask subtask) throws InvalidTaskException {
         if (isTimeIntervalBusy(subtask.getStartTime(), subtask.getEndTime())) {
             throw new InvalidTaskException("Время выполнения новой подзадачи уже занято другой задачей.");
         }
@@ -160,7 +160,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateSubtask(Subtask subtask) {
+    public void updateSubtask(Subtask subtask) throws InvalidTaskException {
         if (isTimeIntervalBusy(subtask.getStartTime(), subtask.getEndTime())) {
             throw new InvalidTaskException("Время выполнения обновленной подзадачи уже занято другой задачей.");
         }

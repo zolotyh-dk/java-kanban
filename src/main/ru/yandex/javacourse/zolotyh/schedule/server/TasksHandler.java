@@ -1,16 +1,24 @@
 package ru.yandex.javacourse.zolotyh.schedule.server;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
+import ru.yandex.javacourse.zolotyh.schedule.exception.InvalidTaskException;
 import ru.yandex.javacourse.zolotyh.schedule.manager.task.TaskManager;
+import ru.yandex.javacourse.zolotyh.schedule.task.Task;
 
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 
 public class TasksHandler extends BaseHttpHandler implements HttpHandler {
-    private TaskManager taskManager;
-    private Gson gson;
+    private final TaskManager taskManager;
+    private final Gson gson;
 
     public TasksHandler(TaskManager taskManager, Gson gson) {
         this.taskManager = taskManager;
@@ -18,75 +26,122 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     @Override
-    public void handle(HttpExchange httpExchange) throws IOException {
+    public void handle(HttpExchange httpExchange) {
         System.out.println("Началась обработка /task запроса от клиента.");
-        try {
+        try (httpExchange) {
             String path = httpExchange.getRequestURI().getPath();
             String requestMethod = httpExchange.getRequestMethod();
             switch (requestMethod) {
-                case "GET": {
+                case GET:
                     if (Pattern.matches("^/tasks$", path)) {
-                        handleGetAllTasks(httpExchange);
-                    }
-                    if (Pattern.matches("^/tasks/\\d+$", path)) {
-                        handleGetTask(httpExchange);
-                    }
-                    break;
-                }
-
-                case "PUT": {
-                    break;
-                }
-
-                case "DELETE": {
-                    if (Pattern.matches("^/tasks/\\d+$", path)) {
-                        handleDeleteTask(httpExchange);
+                        handleGetTasks(httpExchange); //GET /tasks
+                    } else if (Pattern.matches("^/tasks/\\d+$", path)) {
+                        handleGetTaskById(httpExchange, path); //GET /tasks/{id}
                     } else {
-                        System.out.println("Ждем DELETE запрос по пути /tasks/{id}, а получили - " + path);
-                        httpExchange.sendResponseHeaders(NOT_ALLOWED_405, 0);
+                        sendMethodNotAllowed(httpExchange);
                     }
                     break;
-                }
+
+                case POST:
+                    if (Pattern.matches("^/tasks$", path)) {
+                        handleAddNewTask(httpExchange); //POST /tasks
+                    } else if (Pattern.matches("^/tasks/\\d+$", path)) {
+                        handleUpdateTask(httpExchange, path); //POST /task/{id}
+                    } else {
+                        sendMethodNotAllowed(httpExchange);
+                    }
+                    break;
+
+                case DELETE:
+                    if (Pattern.matches("^/tasks/\\d+$", path)) {
+                        handleDeleteTaskById(httpExchange, path); //DELETE /tasks{id}
+                    } else {
+                        httpExchange.sendResponseHeaders(METHOD_NOT_ALLOWED, 0);
+                    }
+                    break;
                 default:
-                    System.out.println("Ждем GET, PUT или DELETE запрос, а получили - " + requestMethod);
-                    httpExchange.sendResponseHeaders(NOT_ALLOWED_405, 0);
+                    sendMethodNotAllowed(httpExchange); //405 - если метод не соответствует ни одному из эндпоинтов
             }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            httpExchange.close();
         }
     }
 
-    private void handleGetAllTasks(HttpExchange httpExchange) throws IOException {
+    private void handleGetTasks(HttpExchange httpExchange) throws IOException {
         String response = gson.toJson(taskManager.getAllTasks());
-        sendText(httpExchange, response);
+        sendText(httpExchange, response); //200
     }
 
-    private void handleGetTask(HttpExchange httpExchange) throws IOException {
-        String path = httpExchange.getRequestURI().getPath();
+    private void handleGetTaskById(HttpExchange httpExchange, String path) throws IOException {
         String pathId = path.replaceFirst("/tasks", "");
-        int id = parsePathId(pathId);
-        if (id != -1) {
+        int id = Integer.parseInt(pathId);
+        try {
             String response = gson.toJson(taskManager.getTaskById(id));
-            sendText(httpExchange, response);
-        } else {
-            System.out.println("Получен некорректный id = " + pathId);
-            httpExchange.sendResponseHeaders(NOT_ALLOWED_405, 0);
+            sendText(httpExchange, response); //200
+        } catch (NoSuchElementException e) {
+            sendNotFound(httpExchange); //404 - если задачи нет
         }
     }
 
-    private void handleDeleteTask(HttpExchange httpExchange) throws IOException {
-        String path = httpExchange.getRequestURI().getPath();
+    private void handleAddNewTask(HttpExchange httpExchange) throws IOException {
+        String json = readText(httpExchange);
+        JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
+        if (!jsonObject.has("name") || !jsonObject.has("description") || !jsonObject.has("status")) {
+            sendBadRequest(httpExchange); //400 - если в JSON нет обязательных полей
+            return;
+        }
+        Task newTask = parseTaskFromJson(jsonObject);
+        try {
+            int id = taskManager.addNewTask(newTask);
+            System.out.println("Добавлена новая задача: " + taskManager.getTaskById(id));
+            sendCreated(httpExchange); //201
+        } catch (InvalidTaskException e) {
+            sendHasInteractions(httpExchange); // 406 - если задача пересекается с существующими
+        }
+    }
+
+    private void handleUpdateTask(HttpExchange httpExchange, String path) throws IOException {
         String pathId = path.replaceFirst("/tasks", "");
-        int id = parsePathId(pathId);
-        if (id != -1) {
-            taskManager.deleteTask(id);
-            System.out.println("Удалили задачу id = " + id);
-            httpExchange.sendResponseHeaders(CREATED_201, 0);
+        int requestedId = Integer.parseInt(pathId);
+        String json = readText(httpExchange);
+        JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
+
+        if (!jsonObject.has("id") ||
+                requestedId != jsonObject.get("id").getAsInt() ||
+                !jsonObject.has("name") ||
+                !jsonObject.has("description") ||
+                !jsonObject.has("status")) {
+            sendBadRequest(httpExchange); //400 - если в JSON нет обязательных полей
+            return;
+        }
+
+        Task updatedTask = parseTaskFromJson(jsonObject);
+        try {
+            taskManager.updateTask(updatedTask);
+            sendCreated(httpExchange); //201
+        } catch (InvalidTaskException e) {
+            sendHasInteractions(httpExchange); // 406 - если задача пересекается с существующими
+        }
+
+    }
+
+    private void handleDeleteTaskById(HttpExchange httpExchange, String path) throws IOException {
+        String pathId = path.replaceFirst("/tasks", "");
+        int id = Integer.parseInt(pathId);
+        taskManager.deleteTask(id);
+        sendOk(httpExchange); //200
+    }
+
+    private Task parseTaskFromJson(JsonObject jsonObject) {
+        String name = jsonObject.get("name").getAsString();
+        String description = jsonObject.get("description").getAsString();
+        Status status = Status.valueOf(jsonObject.get("status").getAsString());
+        if (jsonObject.has("duration") && jsonObject.has("startTime")) {
+            Duration duration = Duration.parse(jsonObject.get("duration").getAsString());
+            LocalDateTime startTime = LocalDateTime.parse(jsonObject.get("startTime").getAsString());
+            return new Task(null, name, description, status, duration, startTime);
         } else {
-            System.out.println("Получен некорректный id = " + pathId);
-            httpExchange.sendResponseHeaders(405, 0);
+            return new Task(null, name, description, status);
         }
     }
 }
