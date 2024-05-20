@@ -5,9 +5,9 @@ import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
 
-public class EpicsHandler implements HttpHandler {
+public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
-
+    public void handle(HttpExchange httpExchange) {
+        System.out.println("Началась обработка /epic запроса от клиента.");
     }
 }
