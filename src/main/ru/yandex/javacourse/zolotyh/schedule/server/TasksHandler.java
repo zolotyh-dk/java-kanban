@@ -73,7 +73,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleGetTaskById(HttpExchange httpExchange, String path) throws IOException {
-        String pathId = path.replaceFirst("/tasks", "");
+        String pathId = path.replaceFirst("/tasks/", "");
         int id = Integer.parseInt(pathId);
         try {
             String response = gson.toJson(taskManager.getTaskById(id));
@@ -101,7 +101,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleUpdateTask(HttpExchange httpExchange, String path) throws IOException {
-        String pathId = path.replaceFirst("/tasks", "");
+        String pathId = path.replaceFirst("/tasks/", "");
         int requestedId = Integer.parseInt(pathId);
         String json = readText(httpExchange);
         JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
@@ -126,7 +126,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleDeleteTaskById(HttpExchange httpExchange, String path) throws IOException {
-        String pathId = path.replaceFirst("/tasks", "");
+        String pathId = path.replaceFirst("/tasks/", "");
         int id = Integer.parseInt(pathId);
         taskManager.deleteTask(id);
         sendOk(httpExchange); //200
