@@ -27,7 +27,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
 
     @Override
     public void handle(HttpExchange httpExchange) {
-        System.out.println("Началась обработка /task запроса от клиента.");
+        System.out.println("Началась обработка /tasks запроса от клиента.");
         try (httpExchange) {
             String path = httpExchange.getRequestURI().getPath();
             String requestMethod = httpExchange.getRequestMethod();
@@ -38,15 +38,13 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
                     } else if (Pattern.matches("^/tasks/\\d+$", path)) {
                         handleGetTaskById(httpExchange, path); //GET /tasks/{id}
                     } else {
-                        sendMethodNotAllowed(httpExchange);
+                        sendBadRequest(httpExchange);
                     }
                     break;
 
                 case POST:
                     if (Pattern.matches("^/tasks$", path)) {
-                        handleAddNewTask(httpExchange); //POST /tasks
-                    } else if (Pattern.matches("^/tasks/\\d+$", path)) {
-                        handleUpdateTask(httpExchange, path); //POST /task/{id}
+                        handleAddOrUpdateTask(httpExchange); //POST /tasks
                     } else {
                         sendMethodNotAllowed(httpExchange);
                     }
@@ -67,7 +65,8 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
         }
     }
 
-    private void handleGetTasks(HttpExchange httpExchange) throws IOException {
+    private void handleGetTasks(HttpExchange httpExchange) {
+        System.out.println("Клиент запросил список всех задач");
         String response = gson.toJson(taskManager.getAllTasks());
         sendText(httpExchange, response); //200
     }
@@ -75,6 +74,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
     private void handleGetTaskById(HttpExchange httpExchange, String path) throws IOException {
         String pathId = path.replaceFirst("/tasks/", "");
         int id = Integer.parseInt(pathId);
+        System.out.println("Запрошена задача с id=" + id);
         try {
             String response = gson.toJson(taskManager.getTaskById(id));
             sendText(httpExchange, response); //200
@@ -83,65 +83,56 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
         }
     }
 
-    private void handleAddNewTask(HttpExchange httpExchange) throws IOException {
+    private void handleAddOrUpdateTask(HttpExchange httpExchange) throws IOException {
         String json = readText(httpExchange);
         JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
-        if (!jsonObject.has("name") || !jsonObject.has("description") || !jsonObject.has("status")) {
-            sendBadRequest(httpExchange); //400 - если в JSON нет обязательных полей
-            return;
-        }
-        Task newTask = parseTaskFromJson(jsonObject);
-        try {
-            int id = taskManager.addNewTask(newTask);
-            System.out.println("Добавлена новая задача: " + taskManager.getTaskById(id));
-            sendCreated(httpExchange); //201
-        } catch (InvalidTaskException e) {
-            sendHasInteractions(httpExchange); // 406 - если задача пересекается с существующими
-        }
-    }
-
-    private void handleUpdateTask(HttpExchange httpExchange, String path) throws IOException {
-        String pathId = path.replaceFirst("/tasks/", "");
-        int requestedId = Integer.parseInt(pathId);
-        String json = readText(httpExchange);
-        JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
-
         if (!jsonObject.has("id") ||
-                requestedId != jsonObject.get("id").getAsInt() ||
                 !jsonObject.has("name") ||
                 !jsonObject.has("description") ||
                 !jsonObject.has("status")) {
             sendBadRequest(httpExchange); //400 - если в JSON нет обязательных полей
             return;
         }
-
-        Task updatedTask = parseTaskFromJson(jsonObject);
+        Task task = parseTaskFromJson(jsonObject);
+        System.out.println("Десериализовали задачу: " + task);
         try {
-            taskManager.updateTask(updatedTask);
-            sendCreated(httpExchange); //201
+            if (task.getId() == null) {
+                taskManager.addNewTask(task);
+                System.out.println("Добавлена новая задача c id=" + task.getId());
+                sendCreated(httpExchange); //201
+
+            } else {
+                taskManager.updateTask(task);
+                System.out.println("Обновили задачу c id=" + task.getId());
+                sendCreated(httpExchange); //201
+            }
         } catch (InvalidTaskException e) {
             sendHasInteractions(httpExchange); // 406 - если задача пересекается с существующими
         }
-
     }
 
-    private void handleDeleteTaskById(HttpExchange httpExchange, String path) throws IOException {
+    private void handleDeleteTaskById(HttpExchange httpExchange, String path) {
         String pathId = path.replaceFirst("/tasks/", "");
         int id = Integer.parseInt(pathId);
+        System.out.println("Удаляем задачу с id=" + id);
         taskManager.deleteTask(id);
         sendOk(httpExchange); //200
     }
 
     private Task parseTaskFromJson(JsonObject jsonObject) {
+        Integer id = null;
+        if(!jsonObject.get("id").isJsonNull()) {
+            id = jsonObject.get("id").getAsInt();
+        }
         String name = jsonObject.get("name").getAsString();
         String description = jsonObject.get("description").getAsString();
         Status status = Status.valueOf(jsonObject.get("status").getAsString());
         if (jsonObject.has("duration") && jsonObject.has("startTime")) {
             Duration duration = Duration.parse(jsonObject.get("duration").getAsString());
             LocalDateTime startTime = LocalDateTime.parse(jsonObject.get("startTime").getAsString());
-            return new Task(null, name, description, status, duration, startTime);
+            return new Task(id, name, description, status, duration, startTime);
         } else {
-            return new Task(null, name, description, status);
+            return new Task(id, name, description, status);
         }
     }
 }
