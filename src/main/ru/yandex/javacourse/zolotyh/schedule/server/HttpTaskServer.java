@@ -29,7 +29,7 @@ public class HttpTaskServer {
             httpServer = HttpServer.create(new InetSocketAddress("localhost", PORT), 0);
             httpServer.createContext("/tasks", new TasksHandler(taskManager, gson));
             httpServer.createContext("/subtasks", new SubtasksHandler(taskManager, gson));
-            httpServer.createContext("/epics", new EpicsHandler());
+            httpServer.createContext("/epics", new EpicsHandler(taskManager, gson));
             httpServer.createContext("/history", new HistoryHandler());
             httpServer.createContext("/prioritized", new PrioritizedHandler());
         } catch (IOException e) {
