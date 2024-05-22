@@ -38,7 +38,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
                     } else if (Pattern.matches("^/tasks/\\d+$", path)) {
                         handleGetTaskById(httpExchange, path); //GET /tasks/{id}
                     } else {
-                        sendBadRequest(httpExchange);
+                        sendBadRequest(httpExchange); //400 - если для не существует запрошенной комбинации метода и пути
                     }
                     break;
 
@@ -46,7 +46,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
                     if (Pattern.matches("^/tasks$", path)) {
                         handleAddOrUpdateTask(httpExchange); //POST /tasks
                     } else {
-                        sendMethodNotAllowed(httpExchange);
+                        sendBadRequest(httpExchange); //400 - если для не существует запрошенной комбинации метода и пути
                     }
                     break;
 
@@ -54,7 +54,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
                     if (Pattern.matches("^/tasks/\\d+$", path)) {
                         handleDeleteTaskById(httpExchange, path); //DELETE /tasks{id}
                     } else {
-                        httpExchange.sendResponseHeaders(METHOD_NOT_ALLOWED, 0);
+                        sendBadRequest(httpExchange); //400 - если для не существует запрошенной комбинации метода и пути
                     }
                     break;
                 default:
@@ -71,7 +71,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
         sendText(httpExchange, response); //200
     }
 
-    private void handleGetTaskById(HttpExchange httpExchange, String path) throws IOException {
+    private void handleGetTaskById(HttpExchange httpExchange, String path) {
         String pathId = path.replaceFirst("/tasks/", "");
         int id = Integer.parseInt(pathId);
         System.out.println("Запрошена задача с id=" + id);
