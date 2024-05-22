@@ -89,8 +89,11 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
         if (!jsonObject.has("id") ||
                 !jsonObject.has("name") ||
                 !jsonObject.has("description") ||
-                !jsonObject.has("status")) {
-            sendBadRequest(httpExchange); //400 - если в JSON нет обязательных полей
+                !jsonObject.has("status") ||
+                !jsonObject.has("duration") ||
+                !jsonObject.has("startTime")
+        ) {
+            sendBadRequest(httpExchange); //400 - если в JSON нет какого-то из полей
             return;
         }
         Task task = parseTaskFromJson(jsonObject);
@@ -121,18 +124,18 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
 
     private Task parseTaskFromJson(JsonObject jsonObject) {
         Integer id = null;
-        if(!jsonObject.get("id").isJsonNull()) {
+        if (!jsonObject.get("id").isJsonNull()) {
             id = jsonObject.get("id").getAsInt();
         }
         String name = jsonObject.get("name").getAsString();
         String description = jsonObject.get("description").getAsString();
         Status status = Status.valueOf(jsonObject.get("status").getAsString());
-        if (jsonObject.has("duration") && jsonObject.has("startTime")) {
-            Duration duration = Duration.parse(jsonObject.get("duration").getAsString());
-            LocalDateTime startTime = LocalDateTime.parse(jsonObject.get("startTime").getAsString());
-            return new Task(id, name, description, status, duration, startTime);
-        } else {
-            return new Task(id, name, description, status);
+        Duration duration = null;
+        LocalDateTime startTime = null;
+        if (!jsonObject.get("duration").isJsonNull() && !jsonObject.get("startTime").isJsonNull()) {
+            duration = Duration.parse(jsonObject.get("duration").getAsString());
+            startTime = LocalDateTime.parse(jsonObject.get("startTime").getAsString());
         }
+        return new Task(id, name, description, status, duration, startTime);
     }
 }
