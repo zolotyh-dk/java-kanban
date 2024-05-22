@@ -207,7 +207,9 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteTask(int id) {
         final Task task = tasks.remove(id);
         historyManager.remove(id);
-        prioritizedTasks.remove(task);
+        if (task.getStartTime() != null) {
+            prioritizedTasks.remove(task);
+        }
         freeTimeInterval(task.getStartTime(), task.getEndTime());
     }
 

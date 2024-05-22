@@ -9,7 +9,6 @@ import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
 import ru.yandex.javacourse.zolotyh.schedule.exception.InvalidTaskException;
 import ru.yandex.javacourse.zolotyh.schedule.manager.task.TaskManager;
 import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
-import ru.yandex.javacourse.zolotyh.schedule.task.Task;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -18,12 +17,8 @@ import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 
 public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
-    private final TaskManager taskManager;
-    private final Gson gson;
-
     public SubtasksHandler(TaskManager taskManager, Gson gson) {
-        this.taskManager = taskManager;
-        this.gson = gson;
+        super(taskManager, gson);
     }
 
     @Override
@@ -72,7 +67,7 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
         sendText(httpExchange, response); //200
     }
 
-    private void handleGetSubtaskById(HttpExchange httpExchange, String path) throws IOException {
+    private void handleGetSubtaskById(HttpExchange httpExchange, String path) {
         String pathId = path.replaceFirst("/subtasks/", "");
         int id = Integer.parseInt(pathId);
         System.out.println("Запрошена подзадача с id=" + id);

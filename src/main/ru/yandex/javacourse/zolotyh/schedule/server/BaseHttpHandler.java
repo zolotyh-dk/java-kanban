@@ -1,6 +1,8 @@
 package ru.yandex.javacourse.zolotyh.schedule.server;
 
+import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
+import ru.yandex.javacourse.zolotyh.schedule.manager.task.TaskManager;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -8,6 +10,13 @@ import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
 public class BaseHttpHandler {
+    protected final TaskManager taskManager;
+    protected final Gson gson;
+
+    protected BaseHttpHandler(TaskManager taskManager, Gson gson) {
+        this.taskManager = taskManager;
+        this.gson = gson;
+    }
     public static final String GET = "GET";
     public static final String POST = "POST";
     public static final String DELETE = "DELETE";

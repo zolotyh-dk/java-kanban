@@ -30,8 +30,8 @@ public class HttpTaskServer {
             httpServer.createContext("/tasks", new TasksHandler(taskManager, gson));
             httpServer.createContext("/subtasks", new SubtasksHandler(taskManager, gson));
             httpServer.createContext("/epics", new EpicsHandler(taskManager, gson));
-            httpServer.createContext("/history", new HistoryHandler());
-            httpServer.createContext("/prioritized", new PrioritizedHandler());
+            httpServer.createContext("/history", new HistoryHandler(taskManager, gson));
+            httpServer.createContext("/prioritized", new PrioritizedHandler(taskManager, gson));
         } catch (IOException e) {
             throw new RuntimeException("Невозможно создать HTTP сервер", e);
         }
