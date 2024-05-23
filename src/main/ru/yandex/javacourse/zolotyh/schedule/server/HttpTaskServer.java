@@ -20,8 +20,8 @@ public class HttpTaskServer {
     private final Gson gson;
     private final TaskManager taskManager;
 
-    public HttpTaskServer() {
-        taskManager = Managers.getDefault();
+    public HttpTaskServer(TaskManager taskManager) {
+        this.taskManager = taskManager;
         gson = new GsonBuilder()
                 .registerTypeAdapter(Duration.class, new DurationAdapter())
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
@@ -48,8 +48,12 @@ public class HttpTaskServer {
         System.out.println("Остановили сервер на порту " + PORT);
     }
 
+    public Gson getGson() {
+        return gson;
+    }
+
     public static void main(String[] args) {
-        HttpTaskServer httpTaskServer = new HttpTaskServer();
+        HttpTaskServer httpTaskServer = new HttpTaskServer(Managers.getDefault());
         httpTaskServer.start();
 //        httpTaskServer.stop();
     }
