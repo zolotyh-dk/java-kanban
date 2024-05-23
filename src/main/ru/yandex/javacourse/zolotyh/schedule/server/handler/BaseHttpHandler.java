@@ -9,6 +9,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 
+import static ru.yandex.javacourse.zolotyh.schedule.server.HttpTaskServer.*;
+
 public class BaseHttpHandler {
     protected final TaskManager taskManager;
     protected final Gson gson;
@@ -17,17 +19,6 @@ public class BaseHttpHandler {
         this.taskManager = taskManager;
         this.gson = gson;
     }
-    public static final String GET = "GET";
-    public static final String POST = "POST";
-    public static final String DELETE = "DELETE";
-
-    public static final int OK = 200; //если сервер корректно выполнил запрос и вернул данные
-    public static final int CREATED = 201; //если запрос выполнен успешно, но возвращать данные нет необходимости
-    public static final int BAD_REQUEST = 400; //если для не существует запрошенной комбинации метода и пути
-    public static final int NOT_FOUND = 404; //если пользователь обратился к несуществующему ресурсу
-    public static final int METHOD_NOT_ALLOWED = 405; //если метод не соответствует ни одному из эндпоинтов
-    public static final int NOT_ACCEPTABLE = 406; //если добавляемая задача пересекается с существующими
-    public static final int INTERNAL_SERVER_ERROR = 500; //если произошла ошибка при обработке запроса
 
     protected void sendText(HttpExchange httpExchange, String text) {
         byte[] response = text.getBytes(StandardCharsets.UTF_8);

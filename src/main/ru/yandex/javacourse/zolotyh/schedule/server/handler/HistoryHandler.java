@@ -7,6 +7,8 @@ import ru.yandex.javacourse.zolotyh.schedule.manager.task.TaskManager;
 
 import java.util.regex.Pattern;
 
+import static ru.yandex.javacourse.zolotyh.schedule.server.HttpTaskServer.GET;
+
 public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
     public HistoryHandler(TaskManager taskManager, Gson gson) {
         super(taskManager, gson);

@@ -116,7 +116,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int addNewTask(Task task) throws InvalidTaskException {
-        if (isTimeIntervalBusy(task.getStartTime(), task.getEndTime())) {
+        if (isTimeIntersection(task, getPrioritizedTasks())) {
             throw new InvalidTaskException("Время выполнения новой задачи уже занято другой задачей.");
         }
         final int id = ++generatorId;
@@ -128,7 +128,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateTask(Task task) throws InvalidTaskException {
-        if (isTimeIntervalBusy(task.getStartTime(), task.getEndTime())) {
+        if (isTimeIntersection(task, getPrioritizedTasks())) {
             throw new InvalidTaskException("Время выполнения обновленной задачи уже занято другой задачей.");
         }
         final int id = task.getId();
@@ -142,7 +142,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Integer addNewSubtask(Subtask subtask) throws InvalidTaskException {
-        if (isTimeIntervalBusy(subtask.getStartTime(), subtask.getEndTime())) {
+        if (isTimeIntersection(subtask, getPrioritizedTasks())) {
             throw new InvalidTaskException("Время выполнения новой подзадачи уже занято другой задачей.");
         }
         final int epicId = subtask.getEpicId();
@@ -161,7 +161,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void updateSubtask(Subtask subtask) throws InvalidTaskException {
-        if (isTimeIntervalBusy(subtask.getStartTime(), subtask.getEndTime())) {
+        if (isTimeIntersection(subtask, getPrioritizedTasks())) {
             throw new InvalidTaskException("Время выполнения обновленной подзадачи уже занято другой задачей.");
         }
         final int id = subtask.getId();
@@ -333,7 +333,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (newTask.getStartTime() == null || newTask.getEndTime() == null) {
             return false;
         }
-        return existedTasks.stream().anyMatch(existedTask -> isTimeIntersection(newTask, existedTask));
+        return existedTasks.stream().filter(task -> !Objects.equals(task.getId(), newTask.getId()))
+                .anyMatch(existedTask -> isTimeIntersection(newTask, existedTask));
     }
 
     private boolean isTimeIntersection(Task newTask, Task existedTask) {

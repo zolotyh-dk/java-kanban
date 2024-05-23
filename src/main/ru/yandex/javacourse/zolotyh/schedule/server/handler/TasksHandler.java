@@ -16,6 +16,8 @@ import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.regex.Pattern;
 
+import static ru.yandex.javacourse.zolotyh.schedule.server.HttpTaskServer.*;
+
 public class TasksHandler extends BaseHttpHandler implements HttpHandler {
     public TasksHandler(TaskManager taskManager, Gson gson) {
         super(taskManager, gson);
@@ -82,12 +84,9 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
     private void handleAddOrUpdateTask(HttpExchange httpExchange) throws IOException {
         String json = readText(httpExchange);
         JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
-        if (!jsonObject.has("id") ||
-                !jsonObject.has("name") ||
+        if (!jsonObject.has("name") ||
                 !jsonObject.has("description") ||
-                !jsonObject.has("status") ||
-                !jsonObject.has("duration") ||
-                !jsonObject.has("startTime")
+                !jsonObject.has("status")
         ) {
             sendBadRequest(httpExchange); //400 - если в JSON нет какого-то из полей
             return;
@@ -120,7 +119,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
 
     private Task parseTaskFromJson(JsonObject jsonObject) {
         Integer id = null;
-        if (!jsonObject.get("id").isJsonNull()) {
+        if (jsonObject.has("id") && !jsonObject.get("id").isJsonNull()) {
             id = jsonObject.get("id").getAsInt();
         }
         String name = jsonObject.get("name").getAsString();
@@ -128,7 +127,11 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
         Status status = Status.valueOf(jsonObject.get("status").getAsString());
         Duration duration = null;
         LocalDateTime startTime = null;
-        if (!jsonObject.get("duration").isJsonNull() && !jsonObject.get("startTime").isJsonNull()) {
+        if (jsonObject.has("duration") &&
+                !jsonObject.get("duration").isJsonNull() &&
+                jsonObject.has("startTime") &&
+                !jsonObject.get("startTime").isJsonNull()
+        ) {
             duration = Duration.parse(jsonObject.get("duration").getAsString());
             startTime = LocalDateTime.parse(jsonObject.get("startTime").getAsString());
         }
