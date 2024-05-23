@@ -3,9 +3,10 @@ package ru.yandex.javacourse.zolotyh.schedule.server;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.sun.net.httpserver.HttpServer;
-import ru.yandex.javacourse.zolotyh.schedule.adapter.DurationAdapter;
-import ru.yandex.javacourse.zolotyh.schedule.adapter.LocalDateTimeAdapter;
+import ru.yandex.javacourse.zolotyh.schedule.server.adapter.DurationAdapter;
+import ru.yandex.javacourse.zolotyh.schedule.server.adapter.LocalDateTimeAdapter;
 import ru.yandex.javacourse.zolotyh.schedule.manager.task.TaskManager;
+import ru.yandex.javacourse.zolotyh.schedule.server.handler.*;
 import ru.yandex.javacourse.zolotyh.schedule.util.Managers;
 
 import java.io.IOException;

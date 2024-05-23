@@ -1,4 +1,4 @@
-package ru.yandex.javacourse.zolotyh.schedule.adapter;
+package ru.yandex.javacourse.zolotyh.schedule.server.adapter;
 
 import com.google.gson.TypeAdapter;
 import com.google.gson.stream.JsonReader;

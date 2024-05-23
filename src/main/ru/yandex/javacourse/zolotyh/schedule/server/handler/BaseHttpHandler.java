@@ -1,4 +1,4 @@
-package ru.yandex.javacourse.zolotyh.schedule.server;
+package ru.yandex.javacourse.zolotyh.schedule.server.handler;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;

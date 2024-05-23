@@ -1,11 +1,10 @@
-package ru.yandex.javacourse.zolotyh.schedule.server;
+package ru.yandex.javacourse.zolotyh.schedule.server.handler;
 
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.yandex.javacourse.zolotyh.schedule.manager.task.TaskManager;
 
-import java.io.IOException;
 import java.util.regex.Pattern;
 
 public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
