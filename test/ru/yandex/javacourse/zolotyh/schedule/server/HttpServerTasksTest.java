@@ -25,7 +25,7 @@ class HttpServerTasksTest extends AbstractHttpServerTest {
 
     //GET /tasks => 200
     @Test
-    public void getAllTasksSuccessTest() throws IOException, InterruptedException {
+    public void getAllTasksTest() throws IOException, InterruptedException {
         getTestTasks().forEach(taskManager::addNewTask);
         URI uri = URI.create(URL);
         HttpRequest request = HttpRequest.newBuilder().uri(uri).GET().version(HttpClient.Version.HTTP_1_1).build();
@@ -137,7 +137,7 @@ class HttpServerTasksTest extends AbstractHttpServerTest {
         assertEquals(NOT_ACCEPTABLE, response.statusCode());
     }
 
-    //DELETE /tasks => 200
+    //DELETE /tasks/{id} => 200
     @Test
     public void deleteTaskTest() throws IOException, InterruptedException {
         Task task = getNewTask();

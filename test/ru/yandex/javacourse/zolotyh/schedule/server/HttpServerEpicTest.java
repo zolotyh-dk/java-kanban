@@ -28,7 +28,7 @@ public class HttpServerEpicTest extends AbstractHttpServerTest {
 
     //GET /epics => 200
     @Test
-    public void getAllEpicsSuccessTest() throws IOException, InterruptedException {
+    public void getAllEpicsTest() throws IOException, InterruptedException {
         getTestEpics().forEach(taskManager::addNewEpic);
         URI uri = URI.create(URL);
         HttpRequest request = HttpRequest.newBuilder().uri(uri).GET().version(HttpClient.Version.HTTP_1_1).build();
@@ -134,7 +134,7 @@ public class HttpServerEpicTest extends AbstractHttpServerTest {
     }
 
 
-    //DELETE /epics => 200
+    //DELETE /epics/{id} => 200
     @Test
     public void deleteTaskTest() throws IOException, InterruptedException {
         Epic epic = getNewEpic();
