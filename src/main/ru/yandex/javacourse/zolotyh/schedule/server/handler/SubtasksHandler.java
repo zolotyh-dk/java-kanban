@@ -6,7 +6,7 @@ import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
-import ru.yandex.javacourse.zolotyh.schedule.exception.InvalidTaskException;
+import ru.yandex.javacourse.zolotyh.schedule.exception.TaskIntersectionException;
 import ru.yandex.javacourse.zolotyh.schedule.manager.task.TaskManager;
 import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
 
@@ -84,8 +84,7 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
     private void handleAddOrUpdateSubtask(HttpExchange httpExchange) throws IOException {
         String json = readText(httpExchange);
         JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
-        if (!jsonObject.has("id") ||
-                !jsonObject.has("name") ||
+        if (!jsonObject.has("name") ||
                 !jsonObject.has("description") ||
                 !jsonObject.has("status") ||
                 !jsonObject.has("duration") ||
@@ -108,7 +107,7 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
                 System.out.println("Обновили подзадачу c id=" + subtask.getId());
                 sendCreated(httpExchange); //201
             }
-        } catch (InvalidTaskException e) {
+        } catch (TaskIntersectionException e) {
             sendHasInteractions(httpExchange); // 406 - если подзадача пересекается с существующими
         }
     }
@@ -123,7 +122,7 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
 
     private Subtask parseSubtaskFromJson(JsonObject jsonObject) {
         Integer id = null;
-        if (!jsonObject.get("id").isJsonNull()) {
+        if (jsonObject.has("id") && !jsonObject.get("id").isJsonNull()) {
             id = jsonObject.get("id").getAsInt();
         }
         String name = jsonObject.get("name").getAsString();
@@ -131,7 +130,11 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
         Status status = Status.valueOf(jsonObject.get("status").getAsString());
         Duration duration = null;
         LocalDateTime startTime = null;
-        if (!jsonObject.get("duration").isJsonNull() && !jsonObject.get("startTime").isJsonNull()) {
+        if (jsonObject.has("duration") &&
+                !jsonObject.get("duration").isJsonNull() &&
+                jsonObject.has("startTime") &&
+                !jsonObject.get("startTime").isJsonNull()
+        ) {
             duration = Duration.parse(jsonObject.get("duration").getAsString());
             startTime = LocalDateTime.parse(jsonObject.get("startTime").getAsString());
         }

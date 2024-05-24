@@ -1,12 +1,7 @@
 package ru.yandex.javacourse.zolotyh.schedule.server;
 
-import com.google.gson.Gson;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
-import ru.yandex.javacourse.zolotyh.schedule.manager.task.InMemoryTaskManager;
-import ru.yandex.javacourse.zolotyh.schedule.manager.task.TaskManager;
 import ru.yandex.javacourse.zolotyh.schedule.server.type_token.TaskListTypeToken;
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;
 
@@ -19,34 +14,14 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static ru.yandex.javacourse.zolotyh.schedule.server.HttpTaskServer.*;
 import static ru.yandex.javacourse.zolotyh.schedule.util.TaskUtil.getNewTask;
 import static ru.yandex.javacourse.zolotyh.schedule.util.TaskUtil.getTestTasks;
 
-class HttpTaskServerTasksTest {
+class HttpServerTasksTest extends AbstractHttpServerTest {
     private static final String URL = "http://localhost:8090/tasks";
-    TaskManager taskManager = new InMemoryTaskManager();
-    HttpTaskServer taskServer = new HttpTaskServer(taskManager);
-    Gson gson = taskServer.getGson();
-    HttpClient client;
-
-
-
-    @BeforeEach
-    void setUp() {
-        taskManager.deleteAllTasks();
-        taskManager.deleteAllSubtasks();
-        taskManager.deleteAllEpics();
-        taskServer.start();
-        client = HttpClient.newHttpClient();
-    }
-
-    @AfterEach
-    void tearDown() {
-        taskServer.stop();
-        client.close();
-    }
 
     //GET /tasks => 200
     @Test
@@ -62,7 +37,7 @@ class HttpTaskServerTasksTest {
         assertEquals(3, tasksFromResponse.size(), "Некорректное количество задач");
     }
 
-    //GET /tasks{id} => 200
+    //GET /tasks/{id} => 200
     @Test
     public void getTaskSuccessTest() throws IOException, InterruptedException {
         Task taskAtManager = getNewTask();
@@ -124,7 +99,7 @@ class HttpTaskServerTasksTest {
         assertEquals(NOT_ACCEPTABLE, response.statusCode());
     }
 
-    //POST /task(с полем id) => 201
+    //POST /tasks(с полем id) => 201
     @Test
     public void updateTaskTest() throws IOException, InterruptedException {
         Task task = getNewTask();

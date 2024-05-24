@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import ru.yandex.javacourse.zolotyh.schedule.exception.InvalidTaskException;
+import ru.yandex.javacourse.zolotyh.schedule.exception.TaskIntersectionException;
 import ru.yandex.javacourse.zolotyh.schedule.manager.task.TaskManager;
 import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
 
@@ -95,10 +95,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
     private void handleAddOrUpdateEpic(HttpExchange httpExchange) throws IOException {
         String json = readText(httpExchange);
         JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
-        if (!jsonObject.has("id") ||
-                !jsonObject.has("name") ||
-                !jsonObject.has("description")
-        ) {
+        if (!jsonObject.has("name") || !jsonObject.has("description")) {
             sendBadRequest(httpExchange); //400 - если в JSON нет какого-то из полей
             return;
         }
@@ -116,7 +113,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
                 System.out.println("Теперь эпик такой: " + taskManager.getEpicById(epic.getId()));
                 sendCreated(httpExchange); //201
             }
-        } catch (InvalidTaskException e) {
+        } catch (TaskIntersectionException e) {
             sendHasInteractions(httpExchange); // 406 - если эпик пересекается с существующими
         }
     }
@@ -131,7 +128,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
 
     private Epic parseEpicFromJson(JsonObject jsonObject) {
         Integer id = null;
-        if (!jsonObject.get("id").isJsonNull()) {
+        if (jsonObject.has("id") && !jsonObject.get("id").isJsonNull()) {
             id = jsonObject.get("id").getAsInt();
         }
         String name = jsonObject.get("name").getAsString();

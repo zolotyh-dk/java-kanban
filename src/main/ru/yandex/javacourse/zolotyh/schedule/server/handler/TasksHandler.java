@@ -6,7 +6,7 @@ import com.google.gson.JsonParser;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
-import ru.yandex.javacourse.zolotyh.schedule.exception.InvalidTaskException;
+import ru.yandex.javacourse.zolotyh.schedule.exception.TaskIntersectionException;
 import ru.yandex.javacourse.zolotyh.schedule.manager.task.TaskManager;
 import ru.yandex.javacourse.zolotyh.schedule.task.Task;
 
@@ -104,7 +104,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
                 System.out.println("Обновили задачу c id=" + task.getId());
                 sendCreated(httpExchange); //201
             }
-        } catch (InvalidTaskException e) {
+        } catch (TaskIntersectionException e) {
             sendHasInteractions(httpExchange); // 406 - если задача пересекается с существующими
         }
     }
