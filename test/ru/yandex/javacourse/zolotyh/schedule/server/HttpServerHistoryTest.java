@@ -42,6 +42,7 @@ public class HttpServerHistoryTest extends AbstractHttpServerTest {
 
         assertEquals(OK, response.statusCode());
         List<Task> history = gson.fromJson(response.body(), new TaskListTypeToken().getType());
+        assertEquals(3, history.size(), "Расзмер истории не совпадает");
         assertEquals(history.get(0).getId(), epicId, "Эпик должен быть первым в истории просмотров");
         assertEquals(history.get(1).getId(), subtaskId, "Подзадача должна быть первой в истории просмотров");
         assertEquals(history.get(2).getId(), taskId, "Задача должна быть третьей в истории просмотров");
