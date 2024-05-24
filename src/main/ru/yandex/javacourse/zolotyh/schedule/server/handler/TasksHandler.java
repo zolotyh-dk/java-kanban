@@ -70,8 +70,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleGetTaskById(HttpExchange httpExchange, String path) {
-        String pathId = path.replaceFirst("/tasks/", "");
-        int id = Integer.parseInt(pathId);
+        int id = extractIdFromPath(path);
         System.out.println("Запрошена задача с id=" + id);
         try {
             String response = gson.toJson(taskManager.getTaskById(id));
@@ -84,10 +83,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
     private void handleAddOrUpdateTask(HttpExchange httpExchange) throws IOException {
         String json = readText(httpExchange);
         JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
-        if (!jsonObject.has("name") ||
-                !jsonObject.has("description") ||
-                !jsonObject.has("status")
-        ) {
+        if (!isValidTaskJson(jsonObject)) {
             sendBadRequest(httpExchange); //400 - если в JSON нет какого-то из полей
             return;
         }
@@ -110,8 +106,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleDeleteTaskById(HttpExchange httpExchange, String path) {
-        String pathId = path.replaceFirst("/tasks/", "");
-        int id = Integer.parseInt(pathId);
+        int id = extractIdFromPath(path);
         System.out.println("Удаляем задачу с id=" + id);
         taskManager.deleteTask(id);
         sendOk(httpExchange); //200
@@ -136,5 +131,15 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
             startTime = LocalDateTime.parse(jsonObject.get("startTime").getAsString());
         }
         return new Task(id, name, description, status, duration, startTime);
+    }
+
+    private boolean isValidTaskJson(JsonObject jsonObject) {
+        return jsonObject.has("name") &&
+                jsonObject.has("description") &&
+                jsonObject.has("status");
+    }
+
+    private int extractIdFromPath(String path) {
+        return Integer.parseInt(path.replaceFirst("/tasks/", ""));
     }
 }

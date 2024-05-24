@@ -70,8 +70,7 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleGetSubtaskById(HttpExchange httpExchange, String path) {
-        String pathId = path.replaceFirst("/subtasks/", "");
-        int id = Integer.parseInt(pathId);
+        int id = extractIdFromPath(path);
         System.out.println("Запрошена подзадача с id=" + id);
         try {
             String response = gson.toJson(taskManager.getSubtaskById(id));
@@ -84,13 +83,7 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
     private void handleAddOrUpdateSubtask(HttpExchange httpExchange) throws IOException {
         String json = readText(httpExchange);
         JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
-        if (!jsonObject.has("name") ||
-                !jsonObject.has("description") ||
-                !jsonObject.has("status") ||
-                !jsonObject.has("duration") ||
-                !jsonObject.has("startTime") ||
-                !jsonObject.has("epicId")
-        ) {
+        if (!isValidSubtaskJson(jsonObject)) {
             sendBadRequest(httpExchange); //400 - если в JSON нет какого-то из полей
             return;
         }
@@ -113,8 +106,7 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleDeleteSubtaskById(HttpExchange httpExchange, String path) {
-        String pathId = path.replaceFirst("/subtasks/", "");
-        int id = Integer.parseInt(pathId);
+        int id = extractIdFromPath(path);
         System.out.println("Удаляем подзадачу с id=" + id);
         taskManager.deleteSubtask(id);
         sendOk(httpExchange); //200
@@ -140,5 +132,18 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
         }
         int epicId = jsonObject.get("epicId").getAsInt();
         return new Subtask(id, name, description, status, duration, startTime, epicId);
+    }
+
+    private boolean isValidSubtaskJson(JsonObject jsonObject) {
+       return jsonObject.has("name") &&
+               jsonObject.has("description") &&
+               jsonObject.has("status") &&
+               jsonObject.has("duration") &&
+               jsonObject.has("startTime") &&
+               jsonObject.has("epicId");
+    }
+
+    private int extractIdFromPath(String path) {
+        return Integer.parseInt(path.replaceFirst("/subtasks/", ""));
     }
 }

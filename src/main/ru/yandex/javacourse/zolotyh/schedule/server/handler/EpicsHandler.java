@@ -69,8 +69,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleGetEpicById(HttpExchange httpExchange, String path) {
-        String pathId = path.replaceFirst("/epics/", "");
-        int id = Integer.parseInt(pathId);
+        int id = extractIdFromPath(path);
         System.out.println("Запрошен эпик с id=" + id);
         try {
             String response = gson.toJson(taskManager.getEpicById(id));
@@ -95,7 +94,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
     private void handleAddOrUpdateEpic(HttpExchange httpExchange) throws IOException {
         String json = readText(httpExchange);
         JsonObject jsonObject = JsonParser.parseString(json).getAsJsonObject();
-        if (!jsonObject.has("name") || !jsonObject.has("description")) {
+        if (!isValidEpicJson(jsonObject)) {
             sendBadRequest(httpExchange); //400 - если в JSON нет какого-то из полей
             return;
         }
@@ -119,8 +118,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
     }
 
     private void handleDeleteEpicById(HttpExchange httpExchange, String path) {
-        String pathId = path.replaceFirst("/epics/", "");
-        int id = Integer.parseInt(pathId);
+        int id = extractIdFromPath(path);
         System.out.println("Удаляем эпик с id=" + id);
         taskManager.deleteEpic(id);
         sendOk(httpExchange); //200
@@ -134,5 +132,13 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
         String name = jsonObject.get("name").getAsString();
         String description = jsonObject.get("description").getAsString();
         return new Epic(id, name, description);
+    }
+
+    private boolean isValidEpicJson(JsonObject jsonObject) {
+        return jsonObject.has("name") && jsonObject.has("description");
+    }
+
+    private int extractIdFromPath(String path) {
+        return Integer.parseInt(path.replaceFirst("/epics/", ""));
     }
 }
