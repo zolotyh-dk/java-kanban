@@ -1,7 +1,7 @@
 package ru.yandex.javacourse.zolotyh.schedule.manager.task;
 
 import ru.yandex.javacourse.zolotyh.schedule.enums.Status;
-import ru.yandex.javacourse.zolotyh.schedule.exception.InvalidTaskException;
+import ru.yandex.javacourse.zolotyh.schedule.exception.TaskIntersectionException;
 import ru.yandex.javacourse.zolotyh.schedule.manager.history.HistoryManager;
 import ru.yandex.javacourse.zolotyh.schedule.task.Epic;
 import ru.yandex.javacourse.zolotyh.schedule.task.Subtask;
@@ -115,9 +115,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public int addNewTask(Task task) {
-        if (isTimeIntervalBusy(task.getStartTime(), task.getEndTime())) {
-            throw new InvalidTaskException("Время выполнения новой задачи уже занято другой задачей.");
+    public int addNewTask(Task task) throws TaskIntersectionException {
+        if (isTimeIntersection(task, getPrioritizedTasks())) {
+            throw new TaskIntersectionException("Время выполнения новой задачи уже занято другой задачей.");
         }
         final int id = ++generatorId;
         task.setId(id);
@@ -127,9 +127,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateTask(Task task) {
-        if (isTimeIntervalBusy(task.getStartTime(), task.getEndTime())) {
-            throw new InvalidTaskException("Время выполнения обновленной задачи уже занято другой задачей.");
+    public void updateTask(Task task) throws TaskIntersectionException {
+        if (isTimeIntersection(task, getPrioritizedTasks())) {
+            throw new TaskIntersectionException("Время выполнения обновленной задачи уже занято другой задачей.");
         }
         final int id = task.getId();
         final Task savedTask = tasks.get(id);
@@ -141,9 +141,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Integer addNewSubtask(Subtask subtask) {
-        if (isTimeIntervalBusy(subtask.getStartTime(), subtask.getEndTime())) {
-            throw new InvalidTaskException("Время выполнения новой подзадачи уже занято другой задачей.");
+    public Integer addNewSubtask(Subtask subtask) throws TaskIntersectionException {
+        if (isTimeIntersection(subtask, getPrioritizedTasks())) {
+            throw new TaskIntersectionException("Время выполнения новой подзадачи уже занято другой задачей.");
         }
         final int epicId = subtask.getEpicId();
         final Epic epic = epics.get(epicId);
@@ -160,9 +160,9 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void updateSubtask(Subtask subtask) {
-        if (isTimeIntervalBusy(subtask.getStartTime(), subtask.getEndTime())) {
-            throw new InvalidTaskException("Время выполнения обновленной подзадачи уже занято другой задачей.");
+    public void updateSubtask(Subtask subtask) throws TaskIntersectionException {
+        if (isTimeIntersection(subtask, getPrioritizedTasks())) {
+            throw new TaskIntersectionException("Время выполнения обновленной подзадачи уже занято другой задачей.");
         }
         final int id = subtask.getId();
         final int epicId = subtask.getEpicId();
@@ -197,6 +197,9 @@ public class InMemoryTaskManager implements TaskManager {
         }
         epic.setSubtaskIds(savedEpic.getSubtaskIds());
         epic.setStatus(savedEpic.getStatus());
+        epic.setDuration(savedEpic.getDuration());
+        epic.setStartTime(savedEpic.getStartTime());
+        epic.setEndTime(savedEpic.getEndTime());
         epics.put(id, epic);
     }
 
@@ -204,7 +207,9 @@ public class InMemoryTaskManager implements TaskManager {
     public void deleteTask(int id) {
         final Task task = tasks.remove(id);
         historyManager.remove(id);
-        prioritizedTasks.remove(task);
+        if (task.getStartTime() != null) {
+            prioritizedTasks.remove(task);
+        }
         freeTimeInterval(task.getStartTime(), task.getEndTime());
     }
 
@@ -328,7 +333,8 @@ public class InMemoryTaskManager implements TaskManager {
         if (newTask.getStartTime() == null || newTask.getEndTime() == null) {
             return false;
         }
-        return existedTasks.stream().anyMatch(existedTask -> isTimeIntersection(newTask, existedTask));
+        return existedTasks.stream().filter(task -> !Objects.equals(task.getId(), newTask.getId()))
+                .anyMatch(existedTask -> isTimeIntersection(newTask, existedTask));
     }
 
     private boolean isTimeIntersection(Task newTask, Task existedTask) {

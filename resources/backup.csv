@@ -1,3 +1,3 @@
-id,type,name,status,description,epic
-1,EPIC,Обновленный эпик,NEW,Описание эпика,
+id,type,name,status,description,duration,startTime,epicId
+1,EPIC,Обновленный эпик,NEW,Описание эпика,null,null,
 

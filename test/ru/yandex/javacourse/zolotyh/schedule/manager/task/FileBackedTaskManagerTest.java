@@ -152,7 +152,7 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
         super.updateEpicTest();
         final String[] lines = readBackup(backup);
         assertEquals(9, lines.length, "Количество строк в файле не совпадает.");
-        assertEquals("4,EPIC,Новый эпик,IN_PROGRESS,Описание нового эпика,null,null,", lines[7],
+        assertEquals("4,EPIC,Новый эпик,IN_PROGRESS,Описание нового эпика,240,2024-05-01T10:00,", lines[7],
                 "Сериализованный эпик в файле не совпадает.");
     }
 
